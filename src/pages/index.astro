@@ -45,14 +45,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
       .pill{padding:8px 10px;border-radius:999px;border:1px dashed #2a3b76;background:#0f1736;color:#d7e5ff;font-size:12px}
 
-      .scroll{background:linear-gradient(180deg,#111833,#0e142b); border:1px solid var(--edge); border-radius:18px; padding:20px; box-shadow:0 18px 60px rgba(0,0,0,.35)}
-      .sparkles{position:relative}
-      .sparkles:after{content:""; position:absolute; inset:-2px; pointer-events:none; border-radius:20px;
-        background: radial-gradient(120px 60px at 10% 10%, rgba(255,209,102,.18), transparent 60%),
-                    radial-gradient(160px 70px at 90% 30%, rgba(167,224,255,.18), transparent 60%);
-        filter: blur(2px);
-      }
-
       /* panels below */
       .section{margin:32px 0}
       .section h2{margin:.2rem 0 .6rem;font-size:28px;color:#fff}
@@ -75,21 +67,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <span class="pill">Fantasy Setting</span>
           </div>
         </div>
-
-        <div class="scroll sparkles">
-          <h3 style="margin:.2rem 0 .4rem">About Acroterra</h3>
-          <p style="margin:.2rem 0 .6rem;color:var(--muted)">
-            An ancient world shaped by rival deities, scarred by the War of Eternal Night, and alive with magic, dragons, and restless undead. Today, the welcoming realm of Zoria, the tense lands of Avrela, and war‑torn Neucrela each chart their own fate while legends—old and new—stir.
-          </p>
-          <ul style="margin:0 0 0 1rem; padding:0; color:var(--muted)">
-            <li><strong>Zoria:</strong> a cultural crossroads scarred by war, famed for the floating Tangled Forest and Lake Zoria.</li>
-            <li><strong>Neucrela:</strong> human empires, silver‑starved wastes haunted by undead, and alliances against tyranny.</li>
-            <li><strong>Avrela:</strong> god‑touched coasts, storm‑blessed isles, and cities divided by old tensions.</li>
-          </ul>
-        </div>
       </section>
 
-      <!-- Restored panels -->
       <section class="section">
         <h2>Worlds & One‑Shots</h2>
         <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
