@@ -7,44 +7,57 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1> Well Met, Adventurer!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      :root{
+        --bg:#0b0f1a; --ink:#f5f6ff; --muted:#b9c3e0; --accent:#a7e0ff; --accent2:#ffd166;
+        --panel:#11162a; --edge:#222b4f; --glow: 0 0 24px rgba(167,224,255,.35);
+      }
+      html,body{height:100%}
+      body{
+        margin:0; font:16px/1.6 ui-rounded, system-ui, Segoe UI, Roboto, Ubuntu;
+        color:var(--ink);
+        background:
+          url('/Mountains.png') no-repeat center center fixed,
+          radial-gradient(1000px 600px at 15% -10%, #15224b 0%, var(--bg) 60%),
+          radial-gradient(900px 700px at 90% 10%, #1b2241 0%, transparent 60%),
+          linear-gradient(180deg,#0b0f1a,#0b0f1a);
+        background-size: cover;
+      }
+      header.site{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,rgba(11,15,26,.9),rgba(11,15,26,.6));backdrop-filter:blur(6px)}
+      main{max-width:1100px;margin:0 auto;padding:28px}
+
+      .hero{
+        margin-top:12px; display:grid; gap:26px; grid-template-columns:1.2fr .8fr; align-items:center;
+      }
+      @media (max-width:920px){ .hero{grid-template-columns:1fr} }
+      .crest{display:flex;align-items:center;gap:12px}
+      .crest .gem{width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:var(--glow)}
+      .title{margin:0;font-size:42px;line-height:1.05;letter-spacing:.4px}
+      .subtitle{margin:.3rem 0 0;color:var(--muted)}
+      .scroll{
+        background:linear-gradient(180deg,#111833,#0e142b); border:1px solid var(--edge); border-radius:18px; padding:20px; box-shadow:0 18px 60px rgba(0,0,0,.35);
+      }
+      .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+      .pill{padding:8px 10px;border-radius:999px;border:1px dashed #2a3b76;background:#0f1736;color:#d7e5ff;font-size:12px}
+    </style>
+  </head>
+  <body>
+    <header class="site"><Header /></header>
+    <main>
+      <section class="hero">
+        <div>
+          <div class="crest"><span class="gem" aria-hidden="true"></span><span>DM Wasem welcomes you</span></div>
+          <h1 class="title">Adventurers, welcome to the Table</h1>
+          <p class="subtitle">Campaign portals, session notes, and worlds—explore at your leisure.</p>
+          <div class="badges">
+            <span class="pill">World: Acroterra</span>
+            <span class="pill">Fantasy Setting</span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </body>
 </html>
