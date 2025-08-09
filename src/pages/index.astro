@@ -4,18 +4,32 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
+// Utility to get next session date from a given weekday (0=Sun,...,6=Sat) and biweekly flag
+function getNextSession(weekday, biweekly = false) {
+  const today = new Date();
+  const day = today.getDay();
+  let diff = weekday - day;
+  if (diff <= 0) diff += 7;
+  if (biweekly) diff += 7; // push two weeks if biweekly
+  const nextDate = new Date(today);
+  nextDate.setDate(today.getDate() + diff);
+  return nextDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
 const campaigns = [
   {
     id: 'acroterra',
     title: 'Acroterra',
-    schedule: 'Mondays • 7:00 PM CST • Online',
+    schedule: 'Biweekly • Mondays • 7:00 PM CST • Online',
+    nextSession: getNextSession(1, true), // Monday, biweekly
     blurb:
       'Acroterra is a world forged by gods, scarred by the War of Eternal Night, and alive with magic, danger, and discovery. From Zoria’s welcoming cities and floating forests, to Neucrela’s warring empires and undead wastelands, to Avrela’s god-touched wilds, the land is shaped by ancient rivalries and divine influence. Here, dragons walk among mortals, lost magic sleeps beneath the earth, and every hero’s choice can shift the balance between order and chaos.',
   },
   {
     id: 'drakkenheim',
     title: 'Dungeons of Drakkenheim',
-    schedule: 'Wednesdays (biweekly) • 4:30 PM CST • In Person',
+    schedule: 'Biweekly • Wednesdays • 4:30 PM CST • In Person',
+    nextSession: getNextSession(3, true), // Wednesday, biweekly
     blurb:
       'Delve into a ruined city choked with haze and horrors. Factions clash and every foray changes the map.',
   },
@@ -32,8 +46,8 @@ const campaigns = [
         --ink:#ffffff;
         --muted:#ffffff;
         --accent:#a7e0ff;
-        --panel: rgba(255,255,255,.08);
-        --edge: rgba(255,255,255,.18);
+        --panel: rgba(0,0,0,.5); /* Light translucent black */
+        --edge: rgba(255,255,255,.15);
         --shadow: 0 10px 30px rgba(0,0,0,.35);
         --backdrop: blur(8px);
       }
@@ -94,6 +108,14 @@ const campaigns = [
       .card-body{ padding:18px 18px 20px; }
       .card h3{ margin:0 0 6px; font-size:20px; letter-spacing:.3px; color:#fff; }
       .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#fff; }
+      .next-session{
+        display:inline-block;
+        margin-top:6px;
+        padding:4px 10px;
+        font-size:12px;
+        background: rgba(255,255,255,.15);
+        border-radius: 999px;
+      }
       .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
       .blurb{ margin:12px 0 0; color:#fff; opacity:.92; }
 
@@ -127,6 +149,7 @@ const campaigns = [
                     <span class="dot" aria-hidden="true"></span>
                     <span>{c.schedule}</span>
                   </div>
+                  <div class="next-session">Next Session: {c.nextSession}</div>
                   <p class="blurb">{c.blurb}</p>
                 </div>
               </article>
