@@ -3,113 +3,161 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+// Edit your active campaigns here
+const campaigns = [
+  {
+    id: 'acroterra',
+    title: 'Acroterra',
+    schedule: 'Mondays • 6:30 PM CST • Online',
+    blurb:
+      'Homebrew epic across dragon-ruled provinces. Exploration, politics, and high-stakes heroics.',
+    status: 'Active',
+  },
+  {
+    id: 'drakkenheim',
+    title: 'Dungeons of Drakkenheim',
+    schedule: 'Wednesdays (biweekly) • 4:30 PM CST • In Person',
+    blurb:
+      'Delve into a ruined city choked with haze and horrors. Factions clash and every foray changes the map.',
+    status: 'Active',
+  },
+];
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root{
-        --bg:#0b0f1a; --ink:#f5f6ff; --muted:#b9c3e0; --accent:#a7e0ff; --accent2:#ffd166;
-        --panel:#11162a; --edge:#222b4f; --glow: 0 0 24px rgba(167,224,255,.35);
+        --ink:#ffffff;
+        --muted:#dbe4ff;
+        --accent:#a7e0ff;
+        --panel: rgba(255,255,255,.08);
+        --edge: rgba(255,255,255,.18);
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+        --backdrop: blur(8px);
       }
+
       html,body{height:100%}
       body{
         margin:0;
-        font:16px/1.6 ui-rounded, system-ui, Segoe UI, Roboto, Ubuntu;
-        background:
-          url('/Mountains.png') no-repeat center center fixed,
-          radial-gradient(1000px 600px at 15% -10%, rgba(21,34,75,0.8) 0%, var(--bg) 60%),
-          radial-gradient(900px 700px at 90% 10%, rgba(27,34,65,0.8) 0%, transparent 60%),
-          linear-gradient(180deg,rgba(11,15,26,0.8),rgba(11,15,26,0.8));
-        background-size: cover;
-        color:#fff;
-      }
-
-      main{max-width:1400px;margin:0 auto;padding:28px}
-
-      .hero{
-        margin-top:12px;
-        display:grid;
-        gap:26px;
-        grid-template-columns:1fr;
-        align-items:center;
-        text-align:center;
-      }
-      .title{
-        margin:0;
-        font-size:2.369rem;
-        line-height:1.1;
-        letter-spacing:.4px;
-        max-width:900px;
-        margin-left:auto;
-        margin-right:auto;
-      }
-      .subtitle{
-        margin:.6rem 0 0;
-        font-size:1.25rem;
-        max-width:900px;
-        margin-left:auto;
-        margin-right:auto;
-      }
-
-      /* panels below */
-      .section{margin:32px 0}
-      .section h2{margin:.2rem 0 .6rem;font-size:28px}
-      .grid{display:grid;gap:14px}
-      .card{
-        background:linear-gradient(180deg,#101632,#0c122a);
-        border:1px solid var(--edge);
-        border-radius:16px;
-        padding:16px;
         color:var(--ink);
-        box-shadow:0 12px 40px rgba(0,0,0,.35);
+        font:16px/1.6 ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background: #0b0f1a url('/Mountains.png') center/cover no-repeat fixed;
       }
-      .card h3{margin:.2rem 0 .2rem;color:#fff}
-      .card h4{margin:.1rem 0 .4rem;font-size:16px;color:#fff}
-      .card p{margin:.2rem 0 0;color:var(--muted)}
-      a{color:#fff;text-decoration:none}
-      a:hover{color:var(--accent)}
+
+      /* Soft overlay for readability without touching your Header component */
+      .bg-overlay{
+        position: fixed; inset: 0;
+        background:
+          radial-gradient(1200px 600px at 70% 10%, rgba(0,0,0,.25), transparent 60%),
+          linear-gradient(to bottom, rgba(5,10,20,.45), rgba(5,10,20,.7));
+        pointer-events:none; z-index:0;
+      }
+
+      .wrap{ position:relative; z-index:1; display:flex; min-height:100dvh; flex-direction:column; }
+      main{ flex:1 1 auto; }
+      .container{ width:min(1200px,92%); margin-inline:auto; }
+
+      /* Hero */
+      .hero{ padding: clamp(56px, 8vw, 96px) 0 24px; text-align:center; }
+      .title{
+        margin:0 0 8px;
+        font-size: clamp(28px, 5vw, 56px);
+        line-height:1.1;
+        letter-spacing:.5px;
+        text-shadow: 0 2px 18px rgba(0,0,0,.45);
+      }
+      .tagline{
+        margin:0 auto; max-width:60ch;
+        color:var(--muted);
+        font-size: clamp(16px, 2.2vw, 20px);
+        text-shadow: 0 1px 12px rgba(0,0,0,.35);
+      }
+
+      /* Section header */
+      .section-head{
+        display:flex; align-items:end; justify-content:space-between; gap:16px;
+        margin:32px 0 14px;
+      }
+      .section-head h2{ margin:0; font-size: clamp(20px, 2.8vw, 28px); letter-spacing:.4px; }
+      .section-head .hint{ margin:0; color:var(--muted); font-size:14px; }
+
+      /* Cards */
+      .grid{
+        display:grid; gap:18px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .card{
+        position:relative;
+        background:var(--panel);
+        border:1px solid var(--edge);
+        border-radius:18px;
+        box-shadow:var(--shadow);
+        overflow:hidden;
+        backdrop-filter:var(--backdrop);
+        transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+      }
+      .card:hover{ transform:translateY(-2px); border-color:rgba(255,255,255,.35); box-shadow:0 12px 36px rgba(0,0,0,.45); }
+      .card-body{ padding:18px 18px 20px; }
+      .card h3{ margin:0 0 6px; font-size:20px; letter-spacing:.3px; }
+      .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--muted); }
+      .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+      .blurb{ margin:12px 0 0; color:#f4f7ff; opacity:.92; }
+      .status{
+        position:absolute; top:10px; right:10px;
+        font-size:12px; letter-spacing:.6px; text-transform:uppercase;
+        background: rgba(0,0,0,.35); border:1px solid var(--edge);
+        padding:6px 10px; border-radius:999px; backdrop-filter:var(--backdrop);
+      }
+
+      .spacer{ height:28px; }
+
+      @media (max-width:380px){ .card-body{ padding:16px; } }
     </style>
   </head>
   <body>
-    <Header />
-    <main>
-      <section class="hero">
-        <div>
-          <h1 class="title">Adventurers, welcome to the Table</h1>
-          <p class="subtitle">Campaign portals, session notes, and worlds—explore at your leisure.</p>
-        </div>
-      </section>
+    <div class="bg-overlay" aria-hidden="true"></div>
 
-      <section class="section">
-        <h2>Active Campaigns</h2>
-        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
-          <article class="card">
-            <h3>Acroterra</h3>
-            <h4>Mondays - Biweekly - 7PM CST Foundry VTT</h4>
-            <p>Acroterra is a world forged by gods, scarred by the War of Eternal Night, and alive with magic, danger, and discovery. From Zoria’s welcoming cities and floating forests, to Neucrela’s warring empires and undead wastelands, to Avrela’s god-touched wilds, the land is shaped by ancient rivalries and divine influence. Here, dragons walk among mortals, lost magic sleeps beneath the earth, and every hero’s choice can shift the balance between order and chaos.</p>
-          </article>
-          <article class="card">
-            <h3>Dungeons of Drakkenheim</h3>
-            <h4>Wednesdays - Biweekly - 4:30PM CST In Person</h4>
-            <p>Fifteen years ago, a meteor blast devastated Drakkenheim, transforming it into a haunted, magic-infused ruin. Now, the city lies in ruins—where warped creatures roam and rival factions vie for control of its unstable power. It's a dark fantasy sandbox brimming with eldritch mystery, deadly politics, and untold riches. Where every step through crumbling streets could alter the fate of a broken world.</p>
-          </article>
-        </div>
-      </section>
+    <div class="wrap">
+      <Header />
 
-      <section class="section">
-        <h2>Table Rules</h2>
-        <div class="card">
-          <ul style="margin:0 0 0 1rem;color:var(--muted)">
-            <li>Be excellent to each other.</li>
-            <li>Have fun, lift your party, share the spotlight.</li>
-            <li>Safety tools in use.</li>
-          </ul>
-        </div>
-      </section>
-    </main>
-    <Footer />
+      <main>
+        <header class="hero container">
+          <h1 class="title">{SITE_TITLE}</h1>
+          <p class="tagline">{SITE_DESCRIPTION}</p>
+        </header>
+
+        <section class="container" aria-labelledby="active-campaigns">
+          <div class="section-head">
+            <h2 id="active-campaigns">Active Campaigns</h2>
+            <p class="hint">Schedules and quick summaries</p>
+          </div>
+
+          <div class="grid">
+            {campaigns.map(c => (
+              <article class="card" id={c.id}>
+                <div class="status">{c.status}</div>
+                <div class="card-body">
+                  <h3>{c.title}</h3>
+                  <div class="schedule" aria-label="schedule">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>{c.schedule}</span>
+                  </div>
+                  <p class="blurb">{c.blurb}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div class="spacer"></div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
   </body>
 </html>
