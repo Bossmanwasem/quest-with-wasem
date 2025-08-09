@@ -24,7 +24,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
         background-position: center center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-        color: white; /* Makes all text white */
+        color: white;
       }
       main {
         width: calc(100% - 2em);
@@ -45,7 +45,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
         max-width: calc(100% - 2em);
         margin: auto;
         padding: 1em;
-        color: white; /* Ensures white text inside */
+        color: white;
+        background: rgba(0, 0, 0, 0.6); /* Black translucent */
+        border-radius: 12px; /* Rounded edges */
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5); /* Soft shadow for depth */
       }
       .title {
         margin-bottom: 1em;
