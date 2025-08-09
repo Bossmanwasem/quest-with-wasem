@@ -4,16 +4,33 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-// Utility to get next session date from a given weekday (0=Sun,...,6=Sat) and biweekly flag
+// Function to get the next session date (auto-updates for weekly or biweekly games)
 function getNextSession(weekday, biweekly = false) {
   const today = new Date();
-  const day = today.getDay();
-  let diff = weekday - day;
-  if (diff <= 0) diff += 7;
-  if (biweekly) diff += 7; // push two weeks if biweekly
-  const nextDate = new Date(today);
-  nextDate.setDate(today.getDate() + diff);
-  return nextDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  today.setHours(0, 0, 0, 0);
+  let next = new Date(today);
+
+  // Move to next occurrence of the given weekday
+  const currentDay = today.getDay();
+  let daysUntil = (weekday - currentDay + 7) % 7;
+  if (daysUntil === 0) daysUntil = 7; // always move forward at least one week
+
+  next.setDate(today.getDate() + daysUntil);
+
+  // If it's biweekly and the week offset is odd, push another week
+  if (biweekly) {
+    const weekNum = Math.floor(next.getTime() / (1000 * 60 * 60 * 24 * 7));
+    if (weekNum % 2 !== 0) {
+      next.setDate(next.getDate() + 7);
+    }
+  }
+
+  // If the date is still before today (shouldn't happen but safe guard), push a week
+  if (next <= today) {
+    next.setDate(next.getDate() + (biweekly ? 14 : 7));
+  }
+
+  return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
 const campaigns = [
@@ -31,7 +48,7 @@ const campaigns = [
     schedule: 'Biweekly • Wednesdays • 4:30 PM CST • In Person',
     nextSession: getNextSession(3, true), // Wednesday, biweekly
     blurb:
-      'Delve into a ruined city choked with haze and horrors. Factions clash and every foray changes the map.',
+      'Fifteen years ago, a meteor blast devastated Drakkenheim, transforming it into a haunted, magic-infused ruin. Now, the city lies in ruins—where warped creatures roam and rival factions vie for control of its unstable power. It\'s a dark fantasy sandbox brimming with eldritch mystery, deadly politics, and untold riches—where every step through crumbling streets could alter the fate of a broken world.',
   },
 ];
 ---
