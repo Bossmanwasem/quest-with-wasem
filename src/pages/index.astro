@@ -16,36 +16,38 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       }
       html,body{height:100%}
       body{
-        margin:0; font:16px/1.6 ui-rounded, system-ui, Segoe UI, Roboto, Ubuntu;
-        color:var(--ink);
+        margin:0;
+        font:16px/1.6 ui-rounded, system-ui, Segoe UI, Roboto, Ubuntu;
         background:
           url('/Mountains.png') no-repeat center center fixed,
           radial-gradient(1000px 600px at 15% -10%, rgba(21,34,75,0.8) 0%, var(--bg) 60%),
           radial-gradient(900px 700px at 90% 10%, rgba(27,34,65,0.8) 0%, transparent 60%),
           linear-gradient(180deg,rgba(11,15,26,0.8),rgba(11,15,26,0.8));
         background-size: cover;
-        color:#fff; /* make all text white */
+        color:#fff;
       }
+
       main{max-width:1400px;margin:0 auto;padding:28px}
 
       .hero{
-        margin-top:12px; display:grid; gap:26px; grid-template-columns:1fr; align-items:center;
+        margin-top:12px;
+        display:grid;
+        gap:26px;
+        grid-template-columns:1fr;
+        align-items:center;
         text-align:center;
       }
-      /* Match title sizing from other pages */
       .title{
         margin:0;
-        font-size:2.369rem; /* was 52px */
+        font-size:2.369rem;
         line-height:1.1;
         letter-spacing:.4px;
-        color:#fff;
         max-width:900px;
         margin-left:auto;
         margin-right:auto;
       }
       .subtitle{
         margin:.6rem 0 0;
-        color:#fff;
         font-size:1.25rem;
         max-width:900px;
         margin-left:auto;
@@ -54,7 +56,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
       /* panels below */
       .section{margin:32px 0}
-      .section h2{margin:.2rem 0 .6rem;font-size:28px;color:#fff}
+      .section h2{margin:.2rem 0 .6rem;font-size:28px}
       .grid{display:grid;gap:14px}
       .card{
         background:linear-gradient(180deg,#101632,#0c122a);
@@ -62,7 +64,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         border-radius:16px;
         padding:16px;
         color:var(--ink);
-        box-shadow:0 12px 40px rgba(0,0,0,.35)
+        box-shadow:0 12px 40px rgba(0,0,0,.35);
       }
       .card h3{margin:.2rem 0 .2rem;color:#fff}
       .card h4{margin:.1rem 0 .4rem;font-size:16px;color:#fff}
