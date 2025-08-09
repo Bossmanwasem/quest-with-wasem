@@ -1,6 +1,5 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
@@ -25,13 +24,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
           linear-gradient(180deg,rgba(11,15,26,0.8),rgba(11,15,26,0.8));
         background-size: cover;
       }
-      header.site{
-        position:sticky;top:0;z-index:5;
-        background-color: rgba(255,255,255,0.88);
-        color: #000;
-        backdrop-filter: blur(6px);
-        border-bottom: 1px solid rgba(0,0,0,.08);
-      }
       main{max-width:1400px;margin:0 auto;padding:28px}
 
       .hero{
@@ -52,7 +44,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
     </style>
   </head>
   <body>
-    <header class="site"><Header /></header>
     <main>
       <section class="hero">
         <div>
