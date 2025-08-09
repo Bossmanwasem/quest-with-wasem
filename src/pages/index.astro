@@ -52,6 +52,14 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
                     radial-gradient(160px 70px at 90% 30%, rgba(167,224,255,.18), transparent 60%);
         filter: blur(2px);
       }
+
+      /* panels below */
+      .section{margin:32px 0}
+      .section h2{margin:.2rem 0 .6rem;font-size:28px;color:#fff}
+      .grid{display:grid;gap:14px}
+      .card{background:linear-gradient(180deg,#101632,#0c122a);border:1px solid var(--edge);border-radius:16px;padding:16px;color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+      .card h3{margin:.2rem 0 .2rem}
+      .card p{margin:.2rem 0 0;color:var(--muted)}
     </style>
   </head>
   <body>
@@ -77,6 +85,32 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <li><strong>Zoria:</strong> a cultural crossroads scarred by war, famed for the floating Tangled Forest and Lake Zoria.</li>
             <li><strong>Neucrela:</strong> human empires, silver‑starved wastes haunted by undead, and alliances against tyranny.</li>
             <li><strong>Avrela:</strong> god‑touched coasts, storm‑blessed isles, and cities divided by old tensions.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Restored panels -->
+      <section class="section">
+        <h2>Worlds & One‑Shots</h2>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+          <article class="card">
+            <h3>Acroterra</h3>
+            <p>Deity‑forged lands, dragon heirs, scarce silver, and whispers of another war—your first step begins here.</p>
+          </article>
+          <article class="card">
+            <h3>Coming Soon</h3>
+            <p>New realms appear as the weave shivers. Watch this space for fresh adventures.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Table Rules</h2>
+        <div class="card">
+          <ul style="margin:0 0 0 1rem;color:var(--muted)">
+            <li>Be excellent to each other.</li>
+            <li>Have fun, lift your party, share the spotlight.</li>
+            <li>Safety tools welcome—speak up and we’ll adjust.</li>
           </ul>
         </div>
       </section>
