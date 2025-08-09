@@ -38,8 +38,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         margin-top:12px; display:grid; gap:26px; grid-template-columns:1fr; align-items:center;
         text-align:center;
       }
-      .title{margin:0;font-size:52px;line-height:1.1;letter-spacing:.4px;color:#fff}
-      .subtitle{margin:.6rem 0 0;color:#fff;font-size:20px}
+      .title{margin:0;font-size:52px;line-height:1.1;letter-spacing:.4px;color:#fff;max-width:900px;margin-left:auto;margin-right:auto}
+      .subtitle{margin:.6rem 0 0;color:#fff;font-size:20px;max-width:900px;margin-left:auto;margin-right:auto}
 
       /* panels below */
       .section{margin:32px 0}
@@ -47,6 +47,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       .grid{display:grid;gap:14px}
       .card{background:linear-gradient(180deg,#101632,#0c122a);border:1px solid var(--edge);border-radius:16px;padding:16px;color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.35)}
       .card h3{margin:.2rem 0 .2rem;color:#fff}
+      .card h4{margin:.1rem 0 .4rem;font-size:16px;color:#fff}
       .card p{margin:.2rem 0 0;color:var(--muted)}
     </style>
   </head>
@@ -65,10 +66,12 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
           <article class="card">
             <h3>Acroterra</h3>
+            <h4>Mondays - Biweekly - 7PM CST Foundry VTT</h4>
             <p>Acroterra is a world forged by gods, scarred by the War of Eternal Night, and alive with magic, danger, and discovery. From Zoria’s welcoming cities and floating forests, to Neucrela’s warring empires and undead wastelands, to Avrela’s god-touched wilds, the land is shaped by ancient rivalries and divine influence. Here, dragons walk among mortals, lost magic sleeps beneath the earth, and every hero’s choice can shift the balance between order and chaos.</p>
           </article>
           <article class="card">
             <h3>Dungeons of Drakkenheim</h3>
+            <h4>Wednesdays - Biweekly - 4:30PM CST In Person</h4>
             <p>Fifteen years ago, a meteor blast devastated Drakkenheim, transforming it into a haunted, magic‑infused ruin. Now, the city lies in ruins—where warped creatures roam and rival factions vie for control of its unstable power. It's a dark fantasy sandbox brimming with eldritch mystery, deadly politics, and untold riches. Where every step through crumbling streets could alter the fate of a broken world.</p>
           </article>
         </div>
@@ -77,7 +80,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       <section class="section">
         <h2>Table Rules</h2>
         <div class="card">
-          <ul style="margin:0 0 0 1rem;color:var(--muted")>
+          <ul style="margin:0 0 0 1rem;color:var(--muted)">
             <li>Be excellent to each other.</li>
             <li>Have fun, lift your party, share the spotlight.</li>
             <li>Safety tools in use.</li>
