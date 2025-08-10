@@ -35,22 +35,27 @@ const pdfSrc = '/acroterra.pdf';
 
       .hero{ margin-bottom:12px; }
       .hero img{ width:100%; max-height:300px; object-fit:cover; border-radius:16px; display:block; }
-      .title{ margin:12px 0 6px; font-size:clamp(24px,3.6vw,40px) }
+      .title{ 
+        margin:12px 0 6px; 
+        font-size:clamp(24px,3.6vw,40px); 
+        color: #ffffff; /* Force white title */
+      }
       .sub{ opacity:.9; margin:0 0 12px }
 
       .toolbar{
-        display:flex; gap:10px; align-items:center; justify-content:flex-end;
+        display:flex; flex-wrap: wrap; gap:10px; align-items:center; justify-content:flex-start;
         margin:10px 0 14px;
       }
       .btn{
         appearance:none; border:1px solid var(--edge);
         background: rgba(255,255,255,.08); color:#fff; padding:8px 12px;
         border-radius:10px; text-decoration:none; font-size:14px;
+        transition: background 0.2s, border-color 0.2s;
       }
-      .btn:hover{ border-color:#fff; }
+      .btn:hover{ border-color:#fff; background: rgba(255,255,255,.15); }
 
       .pdf-wrap{
-        height: calc(200vh - 240px); /* Taller to fit almost full page */
+        height: 200vh; /* Very tall viewer */
         border-radius: 16px;
         overflow: hidden;
         box-shadow: 0 10px 30px rgba(0,0,0,.4);
@@ -68,17 +73,21 @@ const pdfSrc = '/acroterra.pdf';
         <h1 class="title">{campaign.title}</h1>
         <p class="sub">{campaign.schedule}</p>
 
-        {isAcroterra && (
-          <div class="toolbar">
-            <a class="btn" href={pdfSrc} target="_blank" rel="noopener">Open in new tab</a>
-            <a class="btn" href={pdfSrc} download>Download PDF</a>
-          </div>
-        )}
+        <div class="toolbar">
+          {isAcroterra && (
+            <>
+              <a class="btn" href={pdfSrc} target="_blank" rel="noopener">Open in new tab</a>
+              <a class="btn" href={pdfSrc} download>Download PDF</a>
+            </>
+          )}
+          <a class="btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+            Go to Virtual Table Top
+          </a>
+        </div>
       </section>
 
       {isAcroterra ? (
         <div class="pdf-wrap">
-          <!-- Built-in browser PDF viewer -->
           <iframe
             class="pdf"
             src={`${pdfSrc}#view=FitH&page=1&toolbar=1&navpanes=1`}
