@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { campaign } = Astro.props;
 const isAcroterra = campaign.id === 'acroterra';
 
-// PDF path in /public
+// PDF lives in /public
 const pdfSrc = '/acroterra.pdf';
 ---
 
@@ -35,27 +35,52 @@ const pdfSrc = '/acroterra.pdf';
 
       .hero{ margin-bottom:12px; }
       .hero img{ width:100%; max-height:300px; object-fit:cover; border-radius:16px; display:block; }
-      .title{ 
-        margin:12px 0 6px; 
-        font-size:clamp(24px,3.6vw,40px); 
-        color: #ffffff; /* Force white title */
+      .title{
+        margin:12px 0 6px;
+        font-size:clamp(24px,3.6vw,40px);
+        color:#ffffff; /* always white */
       }
       .sub{ opacity:.9; margin:0 0 12px }
 
       .toolbar{
-        display:flex; flex-wrap: wrap; gap:10px; align-items:center; justify-content:flex-start;
-        margin:10px 0 14px;
+        display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:flex-start;
+        margin:12px 0 16px;
       }
       .btn{
         appearance:none; border:1px solid var(--edge);
         background: rgba(255,255,255,.08); color:#fff; padding:8px 12px;
         border-radius:10px; text-decoration:none; font-size:14px;
-        transition: background 0.2s, border-color 0.2s;
+        transition: background .2s, border-color .2s, transform .15s;
       }
-      .btn:hover{ border-color:#fff; background: rgba(255,255,255,.15); }
+      .btn:hover{ border-color:#fff; background: rgba(255,255,255,.15); transform: translateY(-1px); }
+
+      /* Standout Virtual Table Top button */
+      .vtt-btn{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:14px 28px;
+        font-size:1.1rem;
+        font-weight:600;
+        color:#fff; /* text stays white */
+        background:#5b2b82; /* dark purple */
+        border:none;
+        border-radius:12px;
+        text-decoration:none;
+        box-shadow:0 6px 16px rgba(0,0,0,0.35);
+        transition: background-color .2s ease, transform .15s ease, box-shadow .2s ease;
+      }
+      .vtt-btn:hover{
+        background:#7d42aa; /* lighter purple hover */
+        transform:translateY(-2px);
+        box-shadow:0 10px 22px rgba(0,0,0,0.45);
+      }
+      .vtt-btn svg{
+        flex-shrink:0;
+      }
 
       .pdf-wrap{
-        height: 200vh; /* Very tall viewer */
+        height: 200vh; /* very tall viewer */
         border-radius: 16px;
         overflow: hidden;
         box-shadow: 0 10px 30px rgba(0,0,0,.4);
@@ -80,14 +105,21 @@ const pdfSrc = '/acroterra.pdf';
               <a class="btn" href={pdfSrc} download>Download PDF</a>
             </>
           )}
-          <a class="btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+          <a class="vtt-btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffd166" viewBox="0 0 24 24">
+              <path d="M12 2 2 9l10 13 10-13-10-7Zm0 2.3L19.1 9H4.9L12 4.3Zm0 15.9-7.16-9.3h14.32L12 20.2Z"/>
+            </svg>
             Go to Virtual Table Top
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffd166" viewBox="0 0 24 24">
+              <path d="M12 2 2 9l10 13 10-13-10-7Zm0 2.3L19.1 9H4.9L12 4.3Zm0 15.9-7.16-9.3h14.32L12 20.2Z"/>
+            </svg>
           </a>
         </div>
       </section>
 
       {isAcroterra ? (
         <div class="pdf-wrap">
+          <!-- Built-in browser PDF viewer -->
           <iframe
             class="pdf"
             src={`${pdfSrc}#view=FitH&page=1&toolbar=1&navpanes=1`}
