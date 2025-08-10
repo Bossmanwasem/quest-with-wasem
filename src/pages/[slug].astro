@@ -1,0 +1,33 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { campaigns } from '../../data/campaigns';
+
+export async function getStaticPaths() {
+  return campaigns.map(c => ({
+    params: { slug: c.id },
+    props: { campaign: c }
+  }));
+}
+
+const { campaign } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={campaign.title} description={campaign.blurb} />
+  </head>
+  <body>
+    <Header />
+    <main class="container" style="color:#fff">
+      <section style="max-width:900px; margin: 32px auto;">
+        <img src={campaign.image} alt={`${campaign.title} banner`} style="width:100%; border-radius:16px; object-fit:cover; max-height:320px;" />
+        <h1 style="margin:16px 0 8px;">{campaign.title}</h1>
+        <p style="opacity:.9; margin:0 0 12px;">{campaign.schedule}</p>
+        <p style="line-height:1.7;">{campaign.blurb}</p>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
