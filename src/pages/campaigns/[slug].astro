@@ -34,17 +34,32 @@ const pdfSrc = '/acroterra.pdf';
       main{ width:min(1200px,94%); margin:24px auto; }
 
       .hero{ margin-bottom:12px; }
-      .hero img{ width:100%; max-height:300px; object-fit:cover; border-radius:16px; display:block; }
+      .hero img {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 1000px;
+        height: auto;
+        border-radius: 16px;
+        object-fit: contain;
+        background-color: #000;
+      }
       .title{
         margin:12px 0 6px;
         font-size:clamp(24px,3.6vw,40px);
         color:#ffffff; /* always white */
+        text-align: center;
       }
-      .sub{ opacity:.9; margin:0 0 12px }
+      .sub{ opacity:.9; margin:0 0 12px; text-align: center; }
 
       .toolbar{
-        display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:flex-start;
-        margin:12px 0 16px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:12px;
+        align-items:center;
+        justify-content:center; /* center buttons */
+        margin:12px auto 16px;
+        max-width:1000px; /* match banner/PDF width */
       }
       .btn{
         appearance:none; border:1px solid var(--edge);
@@ -78,12 +93,16 @@ const pdfSrc = '/acroterra.pdf';
       .vtt-btn svg{ flex-shrink:0; }
 
       .pdf-wrap{
-        height: 200vh; /* very tall viewer */
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,.4);
-        border: 1px solid var(--edge);
-        background: rgba(0,0,0,.4);
+        display:block;
+        margin:24px auto;
+        width:100%;
+        max-width:1000px; /* match banner width */
+        height:200vh; /* very tall viewer */
+        border-radius:16px;
+        overflow:hidden;
+        box-shadow:0 10px 30px rgba(0,0,0,.4);
+        border:1px solid var(--edge);
+        background:rgba(0,0,0,.4);
       }
       .pdf{ width:100%; height:100%; border:0; }
     </style>
