@@ -3,7 +3,6 @@ import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { campaigns } from '../../campaigns';
-import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   return campaigns.map((c) => ({
@@ -13,42 +12,123 @@ export async function getStaticPaths() {
 }
 
 const { campaign } = Astro.props;
-
-let recaps = await getCollection('recaps', (e) => e.data.campaignId === campaign.id);
-recaps = recaps.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
-
-// Pre-render MD to components
-const rendered = await Promise.all(recaps.map(async (entry) => {
-  const { Content } = await render(entry);
-  return { id: entry.id, data: entry.data, Content };
-}));
-
 const isAcroterra = campaign.id === 'acroterra';
 const pdfSrc = '/acroterra.pdf';
 ---
-<!-- ... keep your existing head/styles/hero/buttons ... -->
 
-<!-- Session Recaps -->
-<section class="recaps" aria-labelledby="recaps-heading">
-  <h2 id="recaps-heading" class="title" style="font-size: clamp(20px,2.4vw,28px); margin-bottom: 4px;">
-    Session Recaps
-  </h2>
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={campaign.title} description={campaign.blurb} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg:#0b0f1a;
+        --ink:#fff;
+        --edge:rgba(255,255,255,.15);
+        --accent:#5b2b82;
+        --accent-hover:#7d42aa;
+        --glow: rgba(123, 63, 184, 0.6); /* purple glow */
+      }
+      html,body { height:100% }
+      body {
+        margin:0;
+        color:var(--ink);
+        font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background:#0b0f1a url('/Mountains.png') center/cover fixed no-repeat;
+      }
+      main { width:min(1200px,94%); margin:24px auto; }
 
-  {rendered.length === 0 ? (
-    <div class="recap empty">No recaps yet. Check back after the next session!</div>
-  ) : (
-    rendered.map(({ id, data, Content }) => (
-      <article class="recap" id={id}>
-        <header class="recap-header">
-          <h3 class="recap-title">{data.title}</h3>
-          <p class="recap-date">
-            {data.date.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' })}
-          </p>
-        </header>
-        <div class="recap-body">
-          <Content />
+      .hero { margin-bottom:32px; }
+      .hero img {
+        display:block;
+        margin:0 auto;
+        width:100%;
+        max-width:1000px;
+        height:auto;
+        border-radius:16px;
+        object-fit:contain;
+        background-color:#000;
+      }
+      .title {
+        margin:12px 0 6px;
+        font-size:clamp(24px,3.6vw,40px);
+        color:#ffffff;
+        text-align:center;
+      }
+      .sub { opacity:.9; margin:0 0 20px; text-align:center; }
+
+      .toolbar{
+        display:flex;
+        flex-wrap:wrap;
+        gap:20px;
+        align-items:center;
+        justify-content:center;
+        margin:0 auto;
+        padding-top:8px;
+      }
+      .cta-btn{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:16px 32px;
+        font-size:1.15rem;
+        font-weight:600;
+        color:#fff;
+        background:var(--accent);
+        border:none;
+        border-radius:12px;
+        text-decoration:none;
+        box-shadow:0 6px 16px rgba(0,0,0,0.35);
+        transition: background-color .2s, transform .15s, box-shadow .2s;
+      }
+      .cta-btn:hover{
+        background:var(--accent-hover);
+        transform:translateY(-2px);
+        box-shadow:
+          0 0 12px var(--glow),
+          0 10px 22px rgba(0,0,0,.45);
+        animation: pulse-glow 1.2s ease-in-out infinite alternate; /* pulsing glow while hovered */
+      }
+
+      @keyframes pulse-glow {
+        from {
+          box-shadow:
+            0 0 10px var(--glow),
+            0 10px 22px rgba(0,0,0,.45);
+        }
+        to {
+          box-shadow:
+            0 0 22px var(--glow),
+            0 12px 28px rgba(0,0,0,.5);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="hero">
+        <img src={campaign.image} alt={`${campaign.title} banner`} />
+        <h1 class="title">{campaign.title}</h1>
+        <p class="sub">{campaign.schedule}</p>
+
+        <div class="toolbar">
+          {isAcroterra && (
+            <a class="cta-btn" href={pdfSrc} download>
+              🎲 Download Kevin's Guide to Acroterra PDF 🎲
+            </a>
+          )}
+          <a class="cta-btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+            🎲 Go to Virtual Table Top 🎲
+          </a>
         </div>
-      </article>
-    ))
-  )}
-</section>
+      </section>
+
+      <section>
+        <p>{campaign.blurb}</p>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
