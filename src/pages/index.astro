@@ -5,6 +5,23 @@ import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { campaigns as CAMPAIGNS } from '../campaigns';
 
+// Random fantasy greeting (changes each page load)
+function getRandomGreeting() {
+  const greetings = [
+    "Greetings, traveler — the realms await!",
+    "Welcome, hero. Your quest begins anew.",
+    "By sword or spell, adventure calls you!",
+    "Hail, wanderer! Wonders and perils lie ahead.",
+    "Well met! The tavern tales are true.",
+    "The fates smile — your journey starts here.",
+    "Enter, if you dare, into lands of magic and myth.",
+    "Step lightly—old magic stirs underfoot.",
+    "A new chapter opens to brave hearts.",
+  ];
+  return greetings[Math.floor(Math.random() * greetings.length)];
+}
+const randomGreeting = getRandomGreeting();
+
 // Compute next session (auto-updates; respects biweekly)
 function getNextSession(weekday: number, biweekly = false) {
   const today = new Date();
@@ -62,7 +79,6 @@ const campaigns = CAMPAIGNS.map(c => ({
 
       .hero{ padding: clamp(56px, 8vw, 96px) 0 24px; text-align:center; }
       .title{ margin:0 0 8px; font-size: clamp(28px, 5vw, 56px); line-height:1.1; letter-spacing:.5px; color:#fff; }
-      .tagline{ margin:0 auto; max-width:60ch; color:#fff; font-size: clamp(16px, 2.2vw, 20px); }
 
       .section-head {
         display:flex;
@@ -123,8 +139,7 @@ const campaigns = CAMPAIGNS.map(c => ({
 
       <main>
         <header class="hero container">
-          <h1 class="title">{SITE_TITLE}</h1>
-          <p class="tagline">{SITE_DESCRIPTION}</p>
+          <h1 class="title">{randomGreeting}</h1>
         </header>
 
         <section class="container" aria-labelledby="active-campaigns">
