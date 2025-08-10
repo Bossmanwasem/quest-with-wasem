@@ -3,52 +3,35 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { campaigns as CAMPAIGNS } from '../data/campaigns';
 
-function getNextSession(weekday, biweekly = false) {
+// Compute next session (auto-updates; respects biweekly)
+function getNextSession(weekday: number, biweekly = false) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  let next = new Date(today);
 
   const currentDay = today.getDay();
   let daysUntil = (weekday - currentDay + 7) % 7;
-  if (daysUntil === 0) daysUntil = 7;
+  if (daysUntil === 0) daysUntil = 7; // always jump forward at least 1 week
 
+  const next = new Date(today);
   next.setDate(today.getDate() + daysUntil);
 
   if (biweekly) {
+    // crude even-week alignment—always roll to an "even" week number for consistency
     const weekNum = Math.floor(next.getTime() / (1000 * 60 * 60 * 24 * 7));
-    if (weekNum % 2 !== 0) {
-      next.setDate(next.getDate() + 7);
-    }
+    if (weekNum % 2 !== 0) next.setDate(next.getDate() + 7);
   }
 
-  if (next <= today) {
-    next.setDate(next.getDate() + (biweekly ? 14 : 7));
-  }
+  if (next <= today) next.setDate(next.getDate() + (biweekly ? 14 : 7));
 
   return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
-const campaigns = [
-  {
-    id: 'acroterra',
-    title: 'Acroterra',
-    schedule: 'Biweekly • Mondays • 7:00 PM CST • Online',
-    nextSession: getNextSession(1, true),
-    image: '/acroterra.png',
-    blurb:
-      'Acroterra is a world forged by gods, scarred by the War of Eternal Night, and alive with magic, danger, and discovery. From Zoria’s welcoming cities and floating forests, to Neucrela’s warring empires and undead wastelands, to Avrela’s god-touched wilds, the land is shaped by ancient rivalries and divine influence. Here, dragons walk among mortals, lost magic sleeps beneath the earth, and every hero’s choice can shift the balance between order and chaos.',
-  },
-  {
-    id: 'drakkenheim',
-    title: 'Dungeons of Drakkenheim',
-    schedule: 'Biweekly • Wednesdays • 4:30 PM CST • In Person',
-    nextSession: getNextSession(3, true),
-    image: '/drakkenheim.png',
-    blurb:
-      'Fifteen years ago, a meteor blast devastated Drakkenheim, transforming it into a haunted, magic-infused ruin. Now, the city lies in ruins—where warped creatures roam and rival factions vie for control of its unstable power. It\'s a dark fantasy sandbox brimming with eldritch mystery, deadly politics, and untold riches—where every step through crumbling streets could alter the fate of a broken world.',
-  },
-];
+const campaigns = CAMPAIGNS.map(c => ({
+  ...c,
+  nextSession: getNextSession(c.weekday, c.biweekly),
+}));
 ---
 
 <!doctype html>
@@ -66,7 +49,6 @@ const campaigns = [
         --shadow: 0 10px 30px rgba(0,0,0,.35);
         --backdrop: blur(8px);
       }
-
       html,body{height:100%}
       body{
         margin:0;
@@ -83,54 +65,24 @@ const campaigns = [
       .title{ margin:0 0 8px; font-size: clamp(28px, 5vw, 56px); line-height:1.1; letter-spacing:.5px; color:#fff; }
       .tagline{ margin:0 auto; max-width:60ch; color:#fff; font-size: clamp(16px, 2.2vw, 20px); }
 
-      .section-head{
-        display:flex; align-items:end; justify-content:space-between; gap:16px;
-        margin:32px 0 14px; color:#fff;
-      }
+      .section-head{ display:flex; align-items:end; justify-content:space-between; gap:16px; margin:32px 0 14px; color:#fff; }
       .section-head h2{ margin:0; font-size: clamp(20px, 2.8vw, 28px); letter-spacing:.4px; }
       .section-head .hint{ margin:0; font-size:14px; color:#fff; }
 
       .grid{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .card-link{ text-decoration:none; color:inherit; display:block; }
+      .card{ background:var(--panel); border:1px solid var(--edge); border-radius:18px; box-shadow:var(--shadow); overflow:hidden; backdrop-filter:var(--backdrop); transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; color:#fff; display:flex; flex-direction:column; cursor:pointer; }
+      .card:hover{ transform:translateY(-2px); border-color:rgba(255,255,255,.35); box-shadow:0 12px 36px rgba(0,0,0,.45); }
 
-      .card{
-        background:var(--panel);
-        border:1px solid var(--edge);
-        border-radius:18px;
-        box-shadow:var(--shadow);
-        overflow:hidden;
-        backdrop-filter:var(--backdrop);
-        transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-        color:#fff;
-        display:flex;
-        flex-direction:column;
-      }
-      .card:hover{
-        transform:translateY(-2px);
-        border-color:rgba(255,255,255,.35);
-        box-shadow:0 12px 36px rgba(0,0,0,.45);
-      }
-      .card img{
-        width:100%;
-        height:160px;
-        object-fit:cover;
-        display:block;
-      }
+      .card img{ width:100%; height:160px; object-fit:cover; display:block; }
       .card-body{ padding:18px 18px 20px; flex:1; display:flex; flex-direction:column; }
       .card h3{ margin:0 0 6px; font-size:20px; letter-spacing:.3px; color:#fff; }
       .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#fff; }
-      .next-session{
-        display:inline-block;
-        margin-top:6px;
-        padding:4px 10px;
-        font-size:12px;
-        background: rgba(255,255,255,.15);
-        border-radius: 999px;
-      }
       .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+      .next-session{ display:inline-block; margin-top:6px; padding:4px 10px; font-size:12px; background: rgba(255,255,255,.15); border-radius: 999px; }
       .blurb{ margin:12px 0 0; color:#fff; opacity:.92; }
 
       .spacer{ height:28px; }
-
       @media (max-width:380px){ .card-body{ padding:16px; } }
     </style>
   </head>
@@ -152,18 +104,20 @@ const campaigns = [
 
           <div class="grid">
             {campaigns.map(c => (
-              <article class="card" id={c.id}>
-                <img src={c.image} alt={c.title + ' thumbnail'} />
-                <div class="card-body">
-                  <h3>{c.title}</h3>
-                  <div class="schedule" aria-label="schedule">
-                    <span class="dot" aria-hidden="true"></span>
-                    <span>{c.schedule}</span>
+              <a class="card-link" href={`/campaigns/${c.id}`} aria-label={`Open ${c.title}`}>
+                <article class="card" id={c.id}>
+                  <img src={c.image} alt={`${c.title} thumbnail`} />
+                  <div class="card-body">
+                    <h3>{c.title}</h3>
+                    <div class="schedule" aria-label="schedule">
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>{c.schedule}</span>
+                    </div>
+                    <div class="next-session">Next Session: {c.nextSession}</div>
+                    <p class="blurb">{c.blurb}</p>
                   </div>
-                  <div class="next-session">Next Session: {c.nextSession}</div>
-                  <p class="blurb">{c.blurb}</p>
-                </div>
-              </article>
+                </article>
+              </a>
             ))}
           </div>
 
