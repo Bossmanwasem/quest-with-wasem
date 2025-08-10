@@ -22,7 +22,14 @@ const pdfSrc = '/acroterra.pdf';
     <BaseHead title={campaign.title} description={campaign.blurb} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      :root { --bg:#0b0f1a; --ink:#fff; --edge:rgba(255,255,255,.15); }
+      :root {
+        --bg:#0b0f1a;
+        --ink:#fff;
+        --edge:rgba(255,255,255,.15);
+        --accent:#5b2b82;
+        --accent-hover:#7d42aa;
+        --glow: rgba(123, 63, 184, 0.6); /* purple glow */
+      }
       html,body { height:100% }
       body {
         margin:0;
@@ -32,7 +39,7 @@ const pdfSrc = '/acroterra.pdf';
       }
       main { width:min(1200px,94%); margin:24px auto; }
 
-      .hero { margin-bottom:12px; }
+      .hero { margin-bottom:32px; }
       .hero img {
         display:block;
         margin:0 auto;
@@ -49,61 +56,53 @@ const pdfSrc = '/acroterra.pdf';
         color:#ffffff;
         text-align:center;
       }
-      .sub { opacity:.9; margin:0 0 12px; text-align:center; }
+      .sub { opacity:.9; margin:0 0 20px; text-align:center; }
 
       .toolbar{
         display:flex;
         flex-wrap:wrap;
-        gap:12px;
+        gap:20px;
         align-items:center;
         justify-content:center;
-        margin:12px auto 16px;
-        max-width:1000px; /* align with banner width */
+        margin:0 auto;
+        padding-top:8px;
       }
-      .btn{
-        appearance:none;
-        border:1px solid var(--edge);
-        background:rgba(255,255,255,.08);
+      .cta-btn{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:16px 32px;
+        font-size:1.15rem;
+        font-weight:600;
         color:#fff;
-        padding:8px 12px;
-        border-radius:10px;
+        background:var(--accent);
+        border:none;
+        border-radius:12px;
         text-decoration:none;
-        font-size:14px;
-        transition:background .2s, border-color .2s, transform .15s;
-      }
-      .btn:hover{ border-color:#fff; background:rgba(255,255,255,.15); transform:translateY(-1px); }
-
-      .vtt-btn{
-        display:inline-flex; align-items:center; gap:8px;
-        padding:14px 28px; font-size:1.1rem; font-weight:600;
-        color:#fff; background:#5b2b82; border:none; border-radius:12px;
-        text-decoration:none; box-shadow:0 6px 16px rgba(0,0,0,.35);
+        box-shadow:0 6px 16px rgba(0,0,0,0.35);
         transition: background-color .2s, transform .15s, box-shadow .2s;
       }
-      .vtt-btn:hover{ background:#7d42aa; transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.45); }
-      .vtt-btn svg{ flex-shrink:0; }
+      .cta-btn:hover{
+        background:var(--accent-hover);
+        transform:translateY(-2px);
+        box-shadow:
+          0 0 12px var(--glow),
+          0 10px 22px rgba(0,0,0,.45);
+        animation: pulse-glow 1.2s ease-in-out infinite alternate; /* pulsing glow while hovered */
+      }
 
-      /* PDF viewer matches banner layout */
-      .pdf-wrap{
-        display:block;
-        margin:24px auto;
-        width:100%;
-        max-width:1000px;   /* same as banner */
-        height:200vh;       /* tall viewer */
-        border-radius:16px;
-        overflow:hidden;
-        border:0;           /* match clean banner (no border) */
-        box-shadow:none;    /* match clean banner (no shadow) */
-        background:transparent;
+      @keyframes pulse-glow {
+        from {
+          box-shadow:
+            0 0 10px var(--glow),
+            0 10px 22px rgba(0,0,0,.45);
+        }
+        to {
+          box-shadow:
+            0 0 22px var(--glow),
+            0 12px 28px rgba(0,0,0,.5);
+        }
       }
-      .pdf{
-        width:100%;
-        height:100%;
-        border:0;
-        background:transparent;
-        scrollbar-width:none;       /* Firefox */
-      }
-      .pdf::-webkit-scrollbar{ display:none; } /* WebKit */
     </style>
   </head>
   <body>
@@ -116,36 +115,19 @@ const pdfSrc = '/acroterra.pdf';
 
         <div class="toolbar">
           {isAcroterra && (
-            <>
-              <a class="btn" href={pdfSrc} target="_blank" rel="noopener">Open in new tab</a>
-              <a class="btn" href={pdfSrc} download>Download PDF</a>
-            </>
+            <a class="cta-btn" href={pdfSrc} download>
+              🎲 Download Kevin's Guide to Acroterra PDF 🎲
+            </a>
           )}
-          <a class="vtt-btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffd166" viewBox="0 0 24 24">
-              <path d="M12 2 2 9l10 13 10-13-10-7Zm0 2.3L19.1 9H4.9L12 4.3Zm0 15.9-7.16-9.3h14.32L12 20.2Z"/>
-            </svg>
-            Go to Virtual Table Top
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#ffd166" viewBox="0 0 24 24">
-              <path d="M12 2 2 9l10 13 10-13-10-7Zm0 2.3L19.1 9H4.9L12 4.3Zm0 15.9-7.16-9.3h14.32L12 20.2Z"/>
-            </svg>
+          <a class="cta-btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+            🎲 Go to Virtual Table Top 🎲
           </a>
         </div>
       </section>
 
-      {isAcroterra ? (
-        <div class="pdf-wrap">
-          <iframe
-            class="pdf"
-            src={`${pdfSrc}#view=FitH&page=1&toolbar=1&navpanes=1`}
-            title="Acroterra Guide PDF"
-          ></iframe>
-        </div>
-      ) : (
-        <section>
-          <p>{campaign.blurb}</p>
-        </section>
-      )}
+      <section>
+        <p>{campaign.blurb}</p>
+      </section>
     </main>
     <Footer />
   </body>
