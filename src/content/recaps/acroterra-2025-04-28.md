@@ -1,6 +1,6 @@
 ---
 campaignId: acroterra
-date: "2025-08-11"
+date: "2025-04-28"
 title: "Entry I: Whispers, Weapons, and the Crimson Brand"
 ---
 
