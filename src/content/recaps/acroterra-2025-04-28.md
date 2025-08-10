@@ -1,7 +1,7 @@
 ---
 campaignId: acroterra
-date: 2025-08-11
-title: Entry I: Whispers, Weapons, and the Crimson Brand
+date: "2025-08-11"
+title: "Entry I: Whispers, Weapons, and the Crimson Brand"
 ---
 
 The mists of Wildvale swirled thick as ever as our unlikely champions stepped deeper into the shadows of the city’s scheming heart. Having recently cracked the first of the four Veilstones beneath the desecrated cathedral, the group emerged marked—by power, by blood, and by purpose.
