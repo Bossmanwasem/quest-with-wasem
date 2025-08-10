@@ -2,9 +2,8 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-
-// Your data file lives at quest-with-wasem/src/campaigns.ts
 import { campaigns } from '../../campaigns';
+import { acroterraGuide } from '../../guides/acroterra';
 
 export async function getStaticPaths() {
   return campaigns.map((c) => ({
@@ -14,19 +13,110 @@ export async function getStaticPaths() {
 }
 
 const { campaign } = Astro.props;
+const isAcroterra = campaign.id === 'acroterra';
 ---
 
+<!doctype html>
 <html lang="en">
   <head>
     <BaseHead title={campaign.title} description={campaign.blurb} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root{
+        --ink:#fff; --muted:#e8eeff; --accent:#a7e0ff;
+        --panel: rgba(0,0,0,.5); --edge: rgba(255,255,255,.15);
+        --shadow: 0 10px 30px rgba(0,0,0,.35); --backdrop: blur(8px);
+      }
+      html,body{height:100%}
+      body{
+        margin:0; color:var(--ink);
+        font:16px/1.6 ui-rounded, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background:#0b0f1a url('/Mountains.png') center/cover fixed no-repeat;
+      }
+      .container{ width:min(1100px,92%); margin:24px auto 48px; }
+      .back{ display:inline-block; margin:18px 0 8px; text-decoration:none; color:#fff; opacity:.9; }
+
+      .hero{
+        margin-top: 12px; border-radius: 20px; overflow:hidden;
+        border:1px solid var(--edge); box-shadow: var(--shadow);
+        background: var(--panel); backdrop-filter: var(--backdrop);
+      }
+      .hero img{ width:100%; height:280px; object-fit:cover; display:block; }
+      .hero-body{ padding:16px 18px 18px; }
+      .title{ margin:6px 0 4px; font-size: clamp(24px, 3.6vw, 40px); }
+      .subtitle{ margin:0; color:var(--muted); }
+      .chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+      .chip{ font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.12) }
+
+      .grid{
+        display:grid; gap:18px; margin-top:18px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .panel{
+        background: var(--panel);
+        border:1px solid var(--edge);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: var(--backdrop);
+        display:flex; flex-direction:column;
+      }
+      .panel h3{ margin:0; padding:14px 16px 0; font-size:18px; letter-spacing:.3px; }
+      .panel .body{ padding:12px 16px 16px; color:#fff; }
+      .item{ padding:10px 0; border-top:1px solid rgba(255,255,255,.08); }
+      .item:first-child{ border-top:0; }
+      .item-title{ font-weight:600; }
+      .item-sub{ opacity:.85; font-size:12px; margin-left:4px; }
+    </style>
   </head>
-  <body style="color:#fff; background:#0b0f1a url('/Mountains.png') center/cover fixed;">
+  <body>
     <Header />
-    <main class="container" style="width:min(1200px,92%); margin:32px auto;">
-      <img src={campaign.image} alt={`${campaign.title} banner`} style="width:100%; max-height:320px; object-fit:cover; border-radius:16px;" />
-      <h1 style="margin:16px 0 8px;">{campaign.title}</h1>
-      <p style="opacity:.9; margin:0 0 12px;">{campaign.schedule}</p>
-      <p style="line-height:1.7;">{campaign.blurb}</p>
+    <main class="container">
+      <a class="back" href="/">← Back to campaigns</a>
+
+      <section class="hero">
+        <img src={campaign.image} alt={`${campaign.title} banner`} />
+        <div class="hero-body">
+          <h1 class="title">{campaign.title}</h1>
+          <p class="subtitle">{campaign.schedule}</p>
+          <div class="chips">
+            <span class="chip">Campaign</span>
+            {campaign.biweekly && <span class="chip">Biweekly</span>}
+            {isAcroterra && acroterraGuide.heroNote && <span class="chip">Guide Included</span>}
+          </div>
+        </div>
+      </section>
+
+      {isAcroterra ? (
+        <>
+          <section class="grid">
+            {acroterraGuide.panels.map(p => (
+              <article class="panel">
+                <h3>{p.title}</h3>
+                <div class="body">
+                  {p.body && <p>{p.body}</p>}
+                  {p.items && p.items.map(it => (
+                    <div class="item">
+                      <div class="item-title">
+                        {it.title}{it.subtitle && <span class="item-sub">• {it.subtitle}</span>}
+                      </div>
+                      {it.body && <div style="opacity:.92">{it.body}</div>}
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </section>
+        </>
+      ) : (
+        // default (non-Acroterra) layout stays simple
+        <section class="panel" style="margin-top:18px;">
+          <h3>About this Campaign</h3>
+          <div class="body">
+            <p>{campaign.blurb}</p>
+          </div>
+        </section>
+      )}
     </main>
     <Footer />
   </body>
