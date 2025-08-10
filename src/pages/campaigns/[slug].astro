@@ -38,7 +38,7 @@ const pdfSrc = '/acroterra.pdf';
         display: block;
         margin: 0 auto;
         width: 100%;
-        max-width: 1000px;
+        max-width: 1000px;  /* banner stays capped */
         height: auto;
         border-radius: 16px;
         object-fit: contain;
@@ -47,7 +47,7 @@ const pdfSrc = '/acroterra.pdf';
       .title{
         margin:12px 0 6px;
         font-size:clamp(24px,3.6vw,40px);
-        color:#ffffff; /* always white */
+        color:#ffffff;
         text-align: center;
       }
       .sub{ opacity:.9; margin:0 0 12px; text-align: center; }
@@ -57,9 +57,9 @@ const pdfSrc = '/acroterra.pdf';
         flex-wrap:wrap;
         gap:12px;
         align-items:center;
-        justify-content:center; /* center buttons */
+        justify-content:center;
         margin:12px auto 16px;
-        max-width:1000px; /* match banner/PDF width */
+        max-width:1000px; /* align with banner width */
       }
       .btn{
         appearance:none; border:1px solid var(--edge);
@@ -92,12 +92,13 @@ const pdfSrc = '/acroterra.pdf';
       }
       .vtt-btn svg{ flex-shrink:0; }
 
+      /* Widened PDF viewer — nearly full window width */
       .pdf-wrap{
         display:block;
         margin:24px auto;
-        width:100%;
-        max-width:1000px; /* match banner width */
-        height:200vh; /* very tall viewer */
+        width:96vw;           /* almost full width */
+        max-width:none;       /* remove 1000px cap */
+        height:200vh;         /* tall viewer */
         border-radius:16px;
         overflow:hidden;
         box-shadow:0 10px 30px rgba(0,0,0,.4);
