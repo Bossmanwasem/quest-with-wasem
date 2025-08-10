@@ -22,15 +22,12 @@ function getRandomGreeting() {
 }
 const randomGreeting = getRandomGreeting();
 
-// Compute next session (auto-updates; respects biweekly)
+// Fallback: compute next weekday (weekly/biweekly) if no baseline is set
 function getNextSession(weekday: number, biweekly = false) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  const today = new Date(); today.setHours(0,0,0,0);
   const currentDay = today.getDay();
   let daysUntil = (weekday - currentDay + 7) % 7;
-  if (daysUntil === 0) daysUntil = 7; // always jump forward at least 1 week
-
+  if (daysUntil === 0) daysUntil = 7; // always move forward
   const next = new Date(today);
   next.setDate(today.getDate() + daysUntil);
 
@@ -38,16 +35,33 @@ function getNextSession(weekday: number, biweekly = false) {
     const weekNum = Math.floor(next.getTime() / (1000 * 60 * 60 * 24 * 7));
     if (weekNum % 2 !== 0) next.setDate(next.getDate() + 7);
   }
-
   if (next <= today) next.setDate(next.getDate() + (biweekly ? 14 : 7));
 
   return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 }
 
-const campaigns = CAMPAIGNS.map(c => ({
-  ...c,
-  nextSession: getNextSession(c.weekday, c.biweekly),
-}));
+// New: advance from a fixed baseline month/day & interval (days)
+function getNextFromBaseline(month: number, day: number, intervalDays: number) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  let next = new Date(today.getFullYear(), month - 1, day); // month is 1–12
+  while (next <= today) next.setDate(next.getDate() + intervalDays);
+  return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+// Baseline overrides (MM, DD, intervalDays)
+const NEXT_OVERRIDES: Record<string, {month:number; day:number; intervalDays:number}> = {
+  acroterra:   { month: 8, day: 11, intervalDays: 14 }, // starts Aug 11, then every 14 days
+  drakkenheim: { month: 8, day: 20, intervalDays: 14 }, // starts Aug 20, then every 14 days
+};
+
+// Build campaign list with dynamic nextSession
+const campaigns = CAMPAIGNS.map(c => {
+  const ov = NEXT_OVERRIDES[c.id];
+  const nextSession = ov
+    ? getNextFromBaseline(ov.month, ov.day, ov.intervalDays)
+    : getNextSession(c.weekday, c.biweekly);
+  return { ...c, nextSession };
+});
 ---
 
 <!doctype html>
