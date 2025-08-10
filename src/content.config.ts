@@ -15,4 +15,14 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+// Session recap collection
+const recaps = defineCollection({
+  loader: glob({ base: "./src/content/recaps", pattern: "**/*.md" }),
+  schema: z.object({
+    campaignId: z.string(),
+    date: z.coerce.date(),
+    title: z.string(),
+  }),
+});
+
+export const collections = { blog, recaps };
