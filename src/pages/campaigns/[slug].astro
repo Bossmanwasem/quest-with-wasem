@@ -1,0 +1,33 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+// Your data file lives at quest-with-wasem/src/campaigns.ts
+import { campaigns } from '../../campaigns';
+
+export async function getStaticPaths() {
+  return campaigns.map((c) => ({
+    params: { slug: c.id },
+    props: { campaign: c },
+  }));
+}
+
+const { campaign } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={campaign.title} description={campaign.blurb} />
+  </head>
+  <body style="color:#fff; background:#0b0f1a url('/Mountains.png') center/cover fixed;">
+    <Header />
+    <main class="container" style="width:min(1200px,92%); margin:32px auto;">
+      <img src={campaign.image} alt={`${campaign.title} banner`} style="width:100%; max-height:320px; object-fit:cover; border-radius:16px;" />
+      <h1 style="margin:16px 0 8px;">{campaign.title}</h1>
+      <p style="opacity:.9; margin:0 0 12px;">{campaign.schedule}</p>
+      <p style="line-height:1.7;">{campaign.blurb}</p>
+    </main>
+    <Footer />
+  </body>
+</html>
