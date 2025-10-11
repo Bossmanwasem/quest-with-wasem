@@ -81,6 +81,37 @@ const campaigns = CAMPAIGNS.map(c => {
 });
 
 const oneShots = ONE_SHOTS;
+
+const managedDefaults = [
+  ...campaigns.map(campaign => ({
+    id: campaign.id,
+    title: campaign.title,
+    system: 'D&D 5e',
+    cadence: campaign.schedule,
+    nextSession: campaign.nextSession,
+    notes: campaign.blurb,
+    image: campaign.image,
+    board: 'campaign',
+    layout: 'standard',
+    link: `/campaigns/${campaign.id}`,
+    ctaLabel: 'View details',
+  })),
+  ...oneShots.map(shot => ({
+    id: shot.id,
+    title: shot.title,
+    system: shot.system,
+    cadence: 'One-shot',
+    nextSession: shot.level,
+    notes: shot.blurb,
+    image: shot.image,
+    board: 'oneShot',
+    layout: 'standard',
+    link: shot.vttUrl,
+    ctaLabel: 'Launch the VTT',
+  })),
+];
+
+const managedDefaultsJson = JSON.stringify(managedDefaults).replace(/</g, '\\u003C');
 ---
 
 <!doctype html>
@@ -175,6 +206,16 @@ const oneShots = ONE_SHOTS;
       @media (max-width: 1024px) {
         .card-grid{ grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
       }
+      .card-grid[data-empty="true"]::before{
+        content:'No adventures assigned yet.';
+        display:block;
+        padding:28px;
+        border:1px dashed rgba(210,234,255,.32);
+        border-radius:20px;
+        color:rgba(244,250,255,.72);
+        text-align:center;
+        background:rgba(8,14,28,.6);
+      }
       .card-link{ text-decoration:none; color:inherit; display:block; }
       .card{
         background:var(--panel);
@@ -194,6 +235,10 @@ const oneShots = ONE_SHOTS;
         border-color:rgba(167,224,255,.45);
         box-shadow:0 18px 38px rgba(6,9,20,.55);
       }
+      .card[data-layout="spotlight"]{ grid-column:span 2; }
+      @media (max-width: 900px){
+        .card[data-layout="spotlight"]{ grid-column:auto; }
+      }
 
       .card-media{ position:relative; height:200px; overflow:hidden; }
       .card-media img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -203,6 +248,10 @@ const oneShots = ONE_SHOTS;
         inset:0;
         background:linear-gradient(to top, rgba(6,9,20,.55), transparent 65%);
       }
+      .card[data-has-image="false"] .card-media{ display:flex; align-items:center; justify-content:center; background:linear-gradient(140deg, rgba(18,32,54,.75), rgba(34,54,84,.65)); color:rgba(244,250,255,.82); font-weight:600; letter-spacing:.4px; }
+      .card[data-has-image="false"] .card-media img{ display:none; }
+      .card[data-has-image="false"] .card-media::after{ display:none; }
+      .card[data-has-image="false"] .card-media span{ font-size:12px; text-transform:uppercase; letter-spacing:.32px; opacity:.88; }
       .card-body{ padding:22px 22px 24px; flex:1; display:flex; flex-direction:column; gap:12px; }
       .card h3{ margin:0; font-size:22px; letter-spacing:.4px; color:var(--ink); }
       .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:15px; color:rgba(244,250,255,.92); }
@@ -357,10 +406,10 @@ const oneShots = ONE_SHOTS;
           <div class="adventure-board">
             <div class="adventure-column" aria-labelledby="active-campaigns">
               <h3 id="active-campaigns">Active Campaigns</h3>
-              <div class="card-grid">
+              <div class="card-grid" data-board="campaign">
                 {campaigns.map(c => (
                   <a class="card-link" href={`/campaigns/${c.id}`} aria-label={`Open ${c.title}`}>
-                    <article class="card" id={c.id}>
+                    <article class="card" id={c.id} data-layout="standard" data-has-image="true">
                       <div class="card-media">
                         <img src={c.image} alt={`${c.title} thumbnail`} />
                       </div>
@@ -381,9 +430,9 @@ const oneShots = ONE_SHOTS;
 
             <div class="adventure-column" aria-labelledby="one-shot-adventures">
               <h3 id="one-shot-adventures">One-Shot Adventures</h3>
-              <div class="card-grid card-grid--oneshots">
+              <div class="card-grid card-grid--oneshots" data-board="oneShot">
                 {oneShots.map(shot => (
-                  <article class="card oneshot-card" id={shot.id}>
+                  <article class="card oneshot-card" id={shot.id} data-layout="standard">
                     <div class="placeholder-strip" aria-hidden="true">
                       <span>One-shot template</span>
                     </div>
@@ -427,6 +476,245 @@ const oneShots = ONE_SHOTS;
 
       <Footer />
     </div>
+    <script type="application/json" id="managed-game-defaults">{managedDefaultsJson}</script>
+    <script is:inline>
+      (() => {
+        const STORAGE_KEY = 'dungeonmasterGames.v2';
+        const defaultsEl = document.getElementById('managed-game-defaults');
+        const campaignGrid = document.querySelector('[data-board="campaign"]');
+        const oneShotGrid = document.querySelector('[data-board="oneShot"]');
+        if (!defaultsEl || !campaignGrid || !oneShotGrid) {
+          return;
+        }
+
+        let fallbackCounter = 0;
+        const createId = () => `home-${Date.now()}-${fallbackCounter++}`;
+
+        const parseJson = (text) => {
+          try {
+            return JSON.parse(text);
+          } catch (error) {
+            console.warn('Failed to parse managed defaults', error);
+            return [];
+          }
+        };
+
+        const normalizeGame = (entry) => {
+          if (!entry || typeof entry !== 'object') return null;
+          if (!entry.id) {
+            entry.id = createId();
+          }
+          const board = entry.board === 'oneShot' ? 'oneShot' : 'campaign';
+          const layout = entry.layout === 'spotlight' ? 'spotlight' : 'standard';
+          const link = typeof entry.link === 'string' ? entry.link.trim() : '';
+          const normalized = {
+            id: String(entry.id),
+            title: String(entry.title ?? '').trim() || 'Untitled adventure',
+            system: String(entry.system ?? '').trim() || 'System TBD',
+            cadence: String(entry.cadence ?? '').trim() || (board === 'oneShot' ? 'One-shot' : 'Schedule TBD'),
+            nextSession: String(entry.nextSession ?? '').trim() || (board === 'oneShot' ? 'Ready when you are' : 'Date TBD'),
+            notes: String(entry.notes ?? '').trim(),
+            image: typeof entry.image === 'string' ? entry.image : '',
+            board,
+            layout,
+            link,
+            ctaLabel: String(entry.ctaLabel ?? '').trim(),
+          };
+          if (normalized.link && !normalized.ctaLabel) {
+            normalized.ctaLabel = normalized.board === 'oneShot' ? 'Launch adventure' : 'View details';
+          }
+          return normalized;
+        };
+
+        const defaults = parseJson(defaultsEl.textContent || '[]').map(normalizeGame).filter(Boolean);
+
+        let games = defaults;
+        const storedRaw = localStorage.getItem(STORAGE_KEY);
+        if (storedRaw) {
+          try {
+            games = JSON.parse(storedRaw).map(normalizeGame).filter(Boolean);
+          } catch (error) {
+            console.warn('Failed to parse stored games', error);
+            games = defaults;
+          }
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+        }
+
+        let mutated = false;
+        games = games
+          .map((game) => {
+            const normalized = normalizeGame(game);
+            if (!normalized) return null;
+            if (JSON.stringify(game) !== JSON.stringify(normalized)) {
+              mutated = true;
+            }
+            return normalized;
+          })
+          .filter(Boolean);
+
+        if (mutated) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+        }
+
+        const boardLists = { campaign: [], oneShot: [] };
+        games.forEach((game) => {
+          if (boardLists[game.board]) {
+            boardLists[game.board].push(game);
+          }
+        });
+
+        const renderCampaigns = (list) => {
+          campaignGrid.innerHTML = '';
+          if (!list.length) {
+            campaignGrid.setAttribute('data-empty', 'true');
+            return;
+          }
+          campaignGrid.removeAttribute('data-empty');
+          const fragment = document.createDocumentFragment();
+          list.forEach((game) => {
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.id = game.id;
+            card.setAttribute('data-layout', game.layout);
+            card.setAttribute('data-board', 'campaign');
+            card.setAttribute('data-has-image', game.image ? 'true' : 'false');
+            if (!game.link) {
+              card.style.cursor = 'default';
+            }
+
+            const media = document.createElement('div');
+            media.className = 'card-media';
+            if (game.image) {
+              const img = document.createElement('img');
+              img.src = game.image;
+              img.alt = `${game.title} artwork`;
+              media.appendChild(img);
+            } else {
+              const placeholder = document.createElement('span');
+              placeholder.textContent = 'Artwork coming soon';
+              media.appendChild(placeholder);
+            }
+
+            const body = document.createElement('div');
+            body.className = 'card-body';
+
+            const title = document.createElement('h3');
+            title.textContent = game.title;
+            body.appendChild(title);
+
+            const schedule = document.createElement('div');
+            schedule.className = 'schedule';
+            schedule.setAttribute('aria-label', 'schedule');
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            dot.setAttribute('aria-hidden', 'true');
+            const scheduleText = document.createElement('span');
+            scheduleText.textContent = game.cadence;
+            schedule.appendChild(dot);
+            schedule.appendChild(scheduleText);
+            body.appendChild(schedule);
+
+            const next = document.createElement('div');
+            next.className = 'next-session';
+            next.textContent = `Next Session: ${game.nextSession}`;
+            body.appendChild(next);
+
+            if (game.notes) {
+              const blurb = document.createElement('p');
+              blurb.className = 'blurb';
+              blurb.textContent = game.notes;
+              body.appendChild(blurb);
+            }
+
+            card.appendChild(media);
+            card.appendChild(body);
+
+            if (game.link) {
+              const anchor = document.createElement('a');
+              anchor.className = 'card-link';
+              anchor.href = game.link;
+              anchor.setAttribute('aria-label', `Open ${game.title}`);
+              anchor.appendChild(card);
+              fragment.appendChild(anchor);
+            } else {
+              fragment.appendChild(card);
+            }
+          });
+          campaignGrid.appendChild(fragment);
+        };
+
+        const renderOneShots = (list) => {
+          oneShotGrid.innerHTML = '';
+          if (!list.length) {
+            oneShotGrid.setAttribute('data-empty', 'true');
+            return;
+          }
+          oneShotGrid.removeAttribute('data-empty');
+          const fragment = document.createDocumentFragment();
+          list.forEach((game) => {
+            const card = document.createElement('article');
+            card.className = 'card oneshot-card';
+            card.id = game.id;
+            card.setAttribute('data-layout', game.layout);
+            card.setAttribute('data-board', 'oneShot');
+            card.style.cursor = 'default';
+
+            const strip = document.createElement('div');
+            strip.className = 'placeholder-strip';
+            strip.setAttribute('aria-hidden', 'true');
+            const stripSpan = document.createElement('span');
+            stripSpan.textContent = 'One-shot template';
+            strip.appendChild(stripSpan);
+            card.appendChild(strip);
+
+            const title = document.createElement('h3');
+            title.textContent = game.title;
+            card.appendChild(title);
+
+            const schedule = document.createElement('div');
+            schedule.className = 'schedule';
+            schedule.setAttribute('aria-label', 'recommended party level and system');
+            const dot = document.createElement('span');
+            dot.className = 'dot';
+            dot.setAttribute('aria-hidden', 'true');
+            const scheduleText = document.createElement('span');
+            const scheduleParts = [game.system, game.nextSession].filter(Boolean);
+            scheduleText.textContent = scheduleParts.join(' • ');
+            schedule.appendChild(dot);
+            schedule.appendChild(scheduleText);
+            card.appendChild(schedule);
+
+            if (game.notes) {
+              const blurb = document.createElement('p');
+              blurb.className = 'blurb';
+              blurb.textContent = game.notes;
+              card.appendChild(blurb);
+            }
+
+            if (game.link) {
+              const cta = document.createElement('a');
+              cta.className = 'cta-link';
+              cta.href = game.link;
+              cta.target = '_blank';
+              cta.rel = 'noopener';
+              cta.textContent = game.ctaLabel || 'Launch adventure';
+              const arrow = document.createElement('span');
+              arrow.setAttribute('aria-hidden', 'true');
+              arrow.textContent = '↗';
+              cta.appendChild(arrow);
+              card.appendChild(cta);
+            }
+
+            fragment.appendChild(card);
+          });
+          oneShotGrid.appendChild(fragment);
+        };
+
+        renderCampaigns(boardLists.campaign);
+        renderOneShots(boardLists.oneShot);
+      })();
+    </script>
     <script is:inline>
       const loginModal = document.querySelector('.dungeonmaster-login');
       const toggleButton = document.querySelector('[data-login-toggle]');

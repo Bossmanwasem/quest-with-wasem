@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE } from '../consts';
 import { campaigns as CAMPAIGNS } from '../campaigns';
+import { oneShots as ONE_SHOTS } from '../oneShots';
 
 function formatSessionDate(date: Date) {
   return date.toLocaleDateString('en-US', {
@@ -51,17 +52,37 @@ function getNextFromBaseline(startDateIso?: string, intervalDays?: number) {
   return formatSessionDate(next);
 }
 
-const defaultGames = CAMPAIGNS.map(campaign => ({
-  id: campaign.id,
-  title: campaign.title,
-  system: 'D&D 5e',
-  cadence: campaign.schedule,
-  nextSession:
-    getNextFromBaseline(campaign.startDate, campaign.cadenceDays) ??
-    getNextSessionFromWeekday(campaign.weekday, campaign.biweekly) ??
-    'Date TBD',
-  notes: campaign.blurb,
-}));
+const defaultGames = [
+  ...CAMPAIGNS.map(campaign => ({
+    id: campaign.id,
+    title: campaign.title,
+    system: 'D&D 5e',
+    cadence: campaign.schedule,
+    nextSession:
+      getNextFromBaseline(campaign.startDate, campaign.cadenceDays) ??
+      getNextSessionFromWeekday(campaign.weekday, campaign.biweekly) ??
+      'Date TBD',
+    notes: campaign.blurb,
+    image: campaign.image,
+    board: 'campaign',
+    layout: 'standard',
+    link: `/campaigns/${campaign.id}`,
+    ctaLabel: 'View details',
+  })),
+  ...ONE_SHOTS.map(shot => ({
+    id: shot.id,
+    title: shot.title,
+    system: shot.system,
+    cadence: 'One-shot',
+    nextSession: shot.level,
+    notes: shot.blurb,
+    image: shot.image,
+    board: 'oneShot',
+    layout: 'standard',
+    link: shot.vttUrl,
+    ctaLabel: 'Launch the VTT',
+  })),
+];
 ---
 
 <!doctype html>
@@ -149,7 +170,7 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
       html.dungeonmaster-auth .dashboard-content{ display:grid; gap:32px; }
       html.dungeonmaster-auth .blocked{ display:none; }
 
-      .manager-grid{ display:grid; gap:32px; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); }
+      .manager-grid{ display:grid; gap:32px; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); }
       .panel{
         background:rgba(10,18,32,.82);
         border:1px solid rgba(210,234,255,.35);
@@ -168,25 +189,53 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         border-radius:20px;
         padding:22px;
         display:grid;
-        gap:10px;
+        gap:14px;
       }
       .game-card h3{ margin:0; font-size:20px; color:var(--ink); }
+      .game-card__header{ display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+      .game-card__title{ display:grid; gap:8px; }
+      .game-card__tags{ display:flex; flex-wrap:wrap; gap:8px; }
+      .game-tag{
+        display:inline-flex;
+        align-items:center;
+        padding:4px 12px;
+        border-radius:999px;
+        background:rgba(184,228,255,.22);
+        color:#0a1524;
+        font-size:12px;
+        font-weight:600;
+        letter-spacing:.3px;
+      }
+      .game-tag--muted{ background:rgba(184,228,255,.12); color:rgba(244,250,255,.85); }
+      .game-thumb{
+        width:78px;
+        height:78px;
+        object-fit:cover;
+        border-radius:14px;
+        border:1px solid rgba(210,234,255,.3);
+        box-shadow:0 10px 24px rgba(4,10,22,.45);
+      }
       .game-meta{ display:flex; flex-wrap:wrap; gap:10px; font-size:13px; color:rgba(244,250,255,.85); }
       .game-meta span{ padding:4px 10px; border-radius:999px; background:rgba(184,228,255,.22); color:#0a1524; font-weight:600; }
       .game-notes{ margin:0; color:rgba(244,250,255,.85); font-size:14px; }
-      .card-actions{ display:flex; justify-content:flex-end; }
+      .game-link{ font-size:13px; color:var(--accent); display:flex; align-items:center; gap:8px; }
+      .game-link span{ color:rgba(244,250,255,.72); }
+      .card-actions{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
       .card-actions button{
         padding:8px 14px;
         border-radius:999px;
         border:none;
         font-size:13px;
         cursor:pointer;
-        background:rgba(255,140,180,.25);
+        background:rgba(184,228,255,.18);
         color:var(--ink);
         transition:background .2s ease, color .2s ease;
       }
       .card-actions button:hover,
-      .card-actions button:focus-visible{ background:rgba(255,140,180,.36); color:#050811; }
+      .card-actions button:focus-visible{ background:rgba(184,228,255,.32); color:#050811; }
+      .card-actions button[data-variant="danger"]{ background:rgba(255,140,180,.25); }
+      .card-actions button[data-variant="danger"]:hover,
+      .card-actions button[data-variant="danger"]:focus-visible{ background:rgba(255,140,180,.36); color:#050811; }
 
       form label{ display:grid; gap:6px; font-size:14px; color:rgba(244,250,255,.9); }
       form input,
@@ -200,8 +249,16 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         font:inherit;
       }
       form textarea{ min-height:120px; resize:vertical; }
-      form button[type="submit"]{
-        justify-self:start;
+      .form-status{ margin:0; font-size:13px; color:rgba(244,250,255,.7); }
+      .form-hint{ font-size:12px; color:rgba(244,250,255,.6); }
+      .image-preview{ display:flex; align-items:center; gap:12px; margin-top:8px; }
+      .image-preview[hidden]{ display:none; }
+      .image-preview img{ width:140px; height:96px; object-fit:cover; border-radius:12px; border:1px solid rgba(210,234,255,.32); box-shadow:0 12px 24px rgba(4,10,22,.45); }
+      .image-preview button{ padding:6px 10px; border-radius:999px; border:1px solid rgba(210,234,255,.32); background:transparent; color:rgba(244,250,255,.8); font-size:12px; cursor:pointer; }
+      .image-preview button:hover,
+      .image-preview button:focus-visible{ background:rgba(184,228,255,.18); color:#050811; }
+      .form-actions{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+      .form-actions button[type="submit"]{
         padding:10px 20px;
         border-radius:999px;
         border:none;
@@ -211,6 +268,16 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         cursor:pointer;
         box-shadow:0 16px 32px rgba(167,224,255,.25);
       }
+      .form-actions button[data-cancel]{
+        padding:8px 16px;
+        border-radius:999px;
+        border:1px solid rgba(210,234,255,.35);
+        background:transparent;
+        color:rgba(244,250,255,.82);
+        cursor:pointer;
+      }
+      .form-actions button[data-cancel]:hover,
+      .form-actions button[data-cancel]:focus-visible{ background:rgba(184,228,255,.18); color:#050811; }
       .empty-state{ font-size:14px; color:rgba(244,250,255,.78); }
 
       @media (max-width:720px){
@@ -249,6 +316,7 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
                 <h2>Create or Update a Listing</h2>
                 <p>Fill in the adventure details below. You can use this for new campaigns or one-shots.</p>
                 <form data-game-form>
+                  <p class="form-status" data-form-status>Creating a new listing</p>
                   <label>
                     Adventure title
                     <input type="text" name="title" placeholder="The Whispering Vault" required />
@@ -266,10 +334,45 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
                     <input type="text" name="cadence" placeholder="Weekly • Thursdays • 7:00 PM CST" required />
                   </label>
                   <label>
-                    Notes for yourself
-                    <textarea name="notes" placeholder="Prep list, player roster, or reminders..."></textarea>
+                    Display column
+                    <select name="board">
+                      <option value="campaign" selected>Active Campaigns</option>
+                      <option value="oneShot">One-Shot Showcase</option>
+                    </select>
                   </label>
-                  <button type="submit">Save listing</button>
+                  <label>
+                    Card layout
+                    <select name="layout">
+                      <option value="standard" selected>Standard width</option>
+                      <option value="spotlight">Spotlight (spans two columns)</option>
+                    </select>
+                  </label>
+                  <label>
+                    Call-to-action link
+                    <input type="url" name="link" placeholder="https://play.questwithwasem.com" />
+                    <span class="form-hint">Optional. Cards with a link become clickable.</span>
+                  </label>
+                  <label>
+                    Call-to-action label
+                    <input type="text" name="ctaLabel" placeholder="Launch adventure" />
+                  </label>
+                  <label>
+                    Spotlight description
+                    <textarea name="notes" placeholder="What makes this session exciting?"></textarea>
+                  </label>
+                  <label>
+                    Feature image
+                    <input type="file" name="image" accept="image/*" />
+                    <span class="form-hint">Upload to replace the current artwork.</span>
+                    <div class="image-preview" data-image-preview hidden>
+                      <img alt="" data-image-preview-img />
+                      <button type="button" data-clear-image>Remove image</button>
+                    </div>
+                  </label>
+                  <div class="form-actions">
+                    <button type="submit" data-submit-label>Save listing</button>
+                    <button type="button" data-cancel-edit data-cancel hidden>Cancel editing</button>
+                  </div>
                 </form>
               </article>
             </div>
@@ -297,11 +400,20 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         return;
       }
 
-      const STORAGE_KEY = 'dungeonmasterGames';
+      const STORAGE_KEY = 'dungeonmasterGames.v2';
+      const LEGACY_KEY = 'dungeonmasterGames';
       const defaultsEl = document.getElementById('dungeonmaster-defaults');
       const listEl = document.querySelector('[data-game-list]');
       const emptyState = document.querySelector('[data-empty-state]');
       const form = document.querySelector('[data-game-form]');
+      const statusEl = form?.querySelector('[data-form-status]');
+      const submitButton = form?.querySelector('[data-submit-label]');
+      const cancelEditButton = form?.querySelector('[data-cancel-edit]');
+      const fileInput = form?.querySelector('input[name="image"]');
+      const previewWrapper = form?.querySelector('[data-image-preview]');
+      const previewImg = form?.querySelector('[data-image-preview-img]');
+      const clearImageButton = form?.querySelector('[data-clear-image]');
+
       const createId = () => {
         if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
           return crypto.randomUUID();
@@ -319,25 +431,128 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         }
       };
 
+      const normalizeGame = (game) => {
+        const normalized = {
+          id: typeof game.id === 'string' && game.id ? game.id : createId(),
+          title: String(game.title ?? '').trim() || 'Untitled adventure',
+          system: String(game.system ?? '').trim() || 'System TBD',
+          cadence: String(game.cadence ?? '').trim() || 'Schedule TBD',
+          nextSession: String(game.nextSession ?? '').trim() || 'Date TBD',
+          notes: String(game.notes ?? '').trim(),
+          board: game.board === 'oneShot' ? 'oneShot' : 'campaign',
+          layout: game.layout === 'spotlight' ? 'spotlight' : 'standard',
+          image: typeof game.image === 'string' ? game.image : '',
+          link: typeof game.link === 'string' ? game.link.trim() : '',
+          ctaLabel: String(game.ctaLabel ?? '').trim(),
+        };
+        if (normalized.link && !normalized.ctaLabel) {
+          normalized.ctaLabel = normalized.board === 'oneShot' ? 'Launch adventure' : 'View details';
+        }
+        return normalized;
+      };
+
+      const defaultsRaw = parseDefaults();
+      const defaultsMap = new Map();
+      const defaults = defaultsRaw.map((entry) => {
+        const normalized = normalizeGame(entry);
+        defaultsMap.set(normalized.id, normalized);
+        return normalized;
+      });
+
+      const enrichFromDefaults = (game) => {
+        if (!game) return game;
+        const reference = defaultsMap.get(game.id);
+        if (!reference) return game;
+        const enriched = { ...game };
+        if (!enriched.board) enriched.board = reference.board;
+        if (!enriched.layout) enriched.layout = reference.layout;
+        if (!enriched.image) enriched.image = reference.image;
+        if (!enriched.link) enriched.link = reference.link;
+        if (!enriched.ctaLabel) enriched.ctaLabel = reference.ctaLabel;
+        if (!enriched.notes && typeof reference.notes === 'string') {
+          enriched.notes = reference.notes;
+        }
+        return enriched;
+      };
+
+      const migrateList = (list) =>
+        list
+          .map((entry) => {
+            const candidate = enrichFromDefaults({ ...entry });
+            if (candidate && !candidate.notes && typeof candidate.blurb === 'string') {
+              candidate.notes = candidate.blurb;
+            }
+            return candidate ? normalizeGame(candidate) : null;
+          })
+          .filter((entry) => entry !== null);
+
       const loadGames = () => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           try {
-            return JSON.parse(stored);
+            return migrateList(JSON.parse(stored));
           } catch (error) {
             console.warn('Failed to parse stored games', error);
           }
         }
-        const defaults = parseDefaults();
+        const legacyStored = localStorage.getItem(LEGACY_KEY);
+        if (legacyStored) {
+          try {
+            const migrated = migrateList(JSON.parse(legacyStored));
+            localStorage.removeItem(LEGACY_KEY);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+            return migrated;
+          } catch (error) {
+            console.warn('Failed to migrate legacy games', error);
+          }
+        }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-        return defaults;
+        return defaults.slice();
       };
 
       let games = loadGames();
+      let editingId = null;
+      let currentImageData = null;
 
       const persist = () => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
       };
+
+      const refreshPreview = () => {
+        if (!previewWrapper || !previewImg) return;
+        if (currentImageData) {
+          previewImg.src = currentImageData;
+          previewWrapper.hidden = false;
+        } else {
+          previewImg.src = '';
+          previewWrapper.hidden = true;
+        }
+      };
+
+      const setFormMode = (mode) => {
+        if (!statusEl || !submitButton || !cancelEditButton) return;
+        if (mode === 'edit') {
+          statusEl.textContent = 'Editing existing listing';
+          submitButton.textContent = 'Update listing';
+          cancelEditButton.hidden = false;
+        } else {
+          statusEl.textContent = 'Creating a new listing';
+          submitButton.textContent = 'Save listing';
+          cancelEditButton.hidden = true;
+        }
+      };
+
+      const resetForm = () => {
+        if (!form) return;
+        form.reset();
+        editingId = null;
+        currentImageData = null;
+        setFormMode('create');
+        refreshPreview();
+      };
+
+      setFormMode('create');
+      refreshPreview();
 
       const renderGames = () => {
         if (!listEl || !emptyState) return;
@@ -352,38 +567,232 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
           const item = document.createElement('li');
           item.className = 'game-card';
           item.dataset.index = String(index);
-          item.innerHTML = `
-            <h3>${game.title}</h3>
-            <div class="game-meta">
-              <span>${game.system}</span>
-              <span>${game.cadence}</span>
-              <span>Next: ${game.nextSession}</span>
-            </div>
-            <p class="game-notes">${game.notes || 'No additional notes yet.'}</p>
-            <div class="card-actions">
-              <button type="button" data-remove="${index}">Archive</button>
-            </div>
-          `;
+          item.dataset.id = game.id;
+
+          const header = document.createElement('div');
+          header.className = 'game-card__header';
+
+          const titleGroup = document.createElement('div');
+          titleGroup.className = 'game-card__title';
+
+          const heading = document.createElement('h3');
+          heading.textContent = game.title;
+          titleGroup.appendChild(heading);
+
+          const tags = document.createElement('div');
+          tags.className = 'game-card__tags';
+          const boardTag = document.createElement('span');
+          boardTag.className = 'game-tag';
+          boardTag.textContent = game.board === 'oneShot' ? 'One-Shot Showcase' : 'Active Campaigns';
+          tags.appendChild(boardTag);
+          if (game.layout === 'spotlight') {
+            const layoutTag = document.createElement('span');
+            layoutTag.className = 'game-tag game-tag--muted';
+            layoutTag.textContent = 'Spotlight layout';
+            tags.appendChild(layoutTag);
+          }
+          titleGroup.appendChild(tags);
+
+          header.appendChild(titleGroup);
+
+          if (game.image) {
+            const thumb = document.createElement('img');
+            thumb.className = 'game-thumb';
+            thumb.src = game.image;
+            thumb.alt = '';
+            thumb.setAttribute('aria-hidden', 'true');
+            header.appendChild(thumb);
+          }
+
+          item.appendChild(header);
+
+          const meta = document.createElement('div');
+          meta.className = 'game-meta';
+
+          const systemTag = document.createElement('span');
+          systemTag.textContent = game.system;
+          meta.appendChild(systemTag);
+
+          const cadenceTag = document.createElement('span');
+          cadenceTag.textContent = game.cadence;
+          meta.appendChild(cadenceTag);
+
+          const nextTag = document.createElement('span');
+          nextTag.textContent = `Next: ${game.nextSession}`;
+          meta.appendChild(nextTag);
+
+          item.appendChild(meta);
+
+          if (game.notes) {
+            const notes = document.createElement('p');
+            notes.className = 'game-notes';
+            notes.textContent = game.notes;
+            item.appendChild(notes);
+          }
+
+          if (game.link) {
+            const linkRow = document.createElement('p');
+            linkRow.className = 'game-link';
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = game.ctaLabel || 'View details';
+            const urlSpan = document.createElement('span');
+            urlSpan.textContent = game.link;
+            linkRow.appendChild(labelSpan);
+            linkRow.appendChild(urlSpan);
+            item.appendChild(linkRow);
+          }
+
+          const actions = document.createElement('div');
+          actions.className = 'card-actions';
+
+          const upButton = document.createElement('button');
+          upButton.type = 'button';
+          upButton.dataset.move = 'up';
+          upButton.textContent = 'Move up';
+          if (index === 0) {
+            upButton.disabled = true;
+          }
+          actions.appendChild(upButton);
+
+          const downButton = document.createElement('button');
+          downButton.type = 'button';
+          downButton.dataset.move = 'down';
+          downButton.textContent = 'Move down';
+          if (index === games.length - 1) {
+            downButton.disabled = true;
+          }
+          actions.appendChild(downButton);
+
+          const editButton = document.createElement('button');
+          editButton.type = 'button';
+          editButton.dataset.edit = 'true';
+          editButton.textContent = 'Edit';
+          actions.appendChild(editButton);
+
+          const removeButton = document.createElement('button');
+          removeButton.type = 'button';
+          removeButton.dataset.remove = 'true';
+          removeButton.dataset.variant = 'danger';
+          removeButton.textContent = 'Archive';
+          actions.appendChild(removeButton);
+
+          item.appendChild(actions);
+
           fragment.appendChild(item);
         });
         listEl.appendChild(fragment);
       };
 
       renderGames();
+      persist();
+
+      const readImageFile = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ''));
+          reader.onerror = () => reject(new Error('Failed to read image'));
+          reader.readAsDataURL(file);
+        });
+
+      const populateForm = (game) => {
+        if (!form) return;
+        const titleInput = form.querySelector('[name="title"]');
+        if (titleInput instanceof HTMLInputElement) titleInput.value = game.title;
+        const systemInput = form.querySelector('[name="system"]');
+        if (systemInput instanceof HTMLInputElement) systemInput.value = game.system;
+        const nextSessionInput = form.querySelector('[name="nextSession"]');
+        if (nextSessionInput instanceof HTMLInputElement) nextSessionInput.value = game.nextSession;
+        const cadenceInput = form.querySelector('[name="cadence"]');
+        if (cadenceInput instanceof HTMLInputElement) cadenceInput.value = game.cadence;
+        const boardSelect = form.querySelector('[name="board"]');
+        if (boardSelect instanceof HTMLSelectElement) boardSelect.value = game.board;
+        const layoutSelect = form.querySelector('[name="layout"]');
+        if (layoutSelect instanceof HTMLSelectElement) layoutSelect.value = game.layout;
+        const linkInput = form.querySelector('[name="link"]');
+        if (linkInput instanceof HTMLInputElement) linkInput.value = game.link;
+        const ctaInput = form.querySelector('[name="ctaLabel"]');
+        if (ctaInput instanceof HTMLInputElement) ctaInput.value = game.ctaLabel;
+        const notesArea = form.querySelector('[name="notes"]');
+        if (notesArea instanceof HTMLTextAreaElement) notesArea.value = game.notes;
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        currentImageData = game.image || null;
+        refreshPreview();
+      };
 
       listEl?.addEventListener('click', (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const removeIndex = target.dataset.remove;
-        if (removeIndex === undefined) return;
-        const index = Number.parseInt(removeIndex, 10);
-        if (Number.isNaN(index)) return;
-        games.splice(index, 1);
-        persist();
-        renderGames();
+        if (!(target instanceof HTMLButtonElement)) return;
+        const card = target.closest('.game-card');
+        if (!card) return;
+        const gameId = card.dataset.id || '';
+        const index = games.findIndex((entry) => entry.id === gameId);
+        if (index === -1) return;
+
+        if (target.dataset.remove) {
+          games.splice(index, 1);
+          if (editingId === gameId) {
+            resetForm();
+          }
+          persist();
+          renderGames();
+          return;
+        }
+
+        if (target.dataset.edit) {
+          const game = games[index];
+          editingId = game.id;
+          populateForm(game);
+          setFormMode('edit');
+          return;
+        }
+
+        if (target.dataset.move === 'up' && index > 0) {
+          const [entry] = games.splice(index, 1);
+          games.splice(index - 1, 0, entry);
+          persist();
+          renderGames();
+          return;
+        }
+
+        if (target.dataset.move === 'down' && index < games.length - 1) {
+          const [entry] = games.splice(index, 1);
+          games.splice(index + 1, 0, entry);
+          persist();
+          renderGames();
+          return;
+        }
       });
 
-      form?.addEventListener('submit', (event) => {
+      cancelEditButton?.addEventListener('click', () => {
+        resetForm();
+      });
+
+      fileInput?.addEventListener('change', async () => {
+        const file = fileInput.files?.[0];
+        if (file) {
+          try {
+            currentImageData = await readImageFile(file);
+          } catch (error) {
+            console.warn(error);
+            currentImageData = null;
+          }
+        } else if (!currentImageData) {
+          currentImageData = null;
+        }
+        refreshPreview();
+      });
+
+      clearImageButton?.addEventListener('click', () => {
+        currentImageData = null;
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        refreshPreview();
+      });
+
+      form?.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!form) return;
         const formData = new FormData(form);
@@ -391,14 +800,53 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
         const system = String(formData.get('system') || '').trim();
         const nextSession = String(formData.get('nextSession') || '').trim();
         const cadence = String(formData.get('cadence') || '').trim();
+        const board = String(formData.get('board') || '').trim();
+        const layout = String(formData.get('layout') || '').trim();
+        const link = String(formData.get('link') || '').trim();
+        const ctaLabel = String(formData.get('ctaLabel') || '').trim();
         const notes = String(formData.get('notes') || '').trim();
         if (!title || !system || !nextSession || !cadence) {
           return;
         }
-        games.unshift({ id: createId(), title, system, nextSession, cadence, notes });
+
+        let imageData = currentImageData;
+        const file = fileInput?.files?.[0];
+        if (file) {
+          try {
+            imageData = await readImageFile(file);
+          } catch (error) {
+            console.warn(error);
+          }
+        }
+
+        const payload = normalizeGame({
+          id: editingId || undefined,
+          title,
+          system,
+          nextSession,
+          cadence,
+          board,
+          layout,
+          link,
+          ctaLabel,
+          notes,
+          image: imageData || '',
+        });
+
+        if (editingId) {
+          const index = games.findIndex((entry) => entry.id === editingId);
+          if (index !== -1) {
+            games[index] = payload;
+          }
+        } else {
+          games.unshift(payload);
+        }
+
+        editingId = null;
+        currentImageData = null;
         persist();
         renderGames();
-        form.reset();
+        resetForm();
       });
     </script>
   </body>
