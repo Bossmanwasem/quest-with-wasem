@@ -51,7 +51,7 @@ function getNextFromBaseline(startDateIso?: string, intervalDays?: number) {
   return formatSessionDate(next);
 }
 
-const defaultGames = CAMPAIGNS.map(campaign => ({
+const defaultCampaigns = CAMPAIGNS.map((campaign) => ({
   id: campaign.id,
   title: campaign.title,
   system: 'D&D 5e',
@@ -61,13 +61,190 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
     getNextSessionFromWeekday(campaign.weekday, campaign.biweekly) ??
     'Date TBD',
   notes: campaign.blurb,
+  status: 'Active',
+  vttUrl: 'https://foundryvtt.questwithwasem.com/' + campaign.id,
+  discord: 'https://discord.gg/questwithwasem',
+  mapIndex: 'https://maps.questwithwasem.com/' + campaign.id,
+  themeArt: campaign.image,
 }));
+
+const defaultState = {
+  campaigns: defaultCampaigns,
+  approvals: {
+    players: [
+      {
+        id: 'player-1',
+        name: 'Lena Sunfell',
+        email: 'lena@astralmail.com',
+        requested: ['Acroterra'],
+        note: 'Referred by Gideon. Wants to try co-GM role later.',
+      },
+      {
+        id: 'player-2',
+        name: 'Marq the Bold',
+        email: 'marq@skydock.net',
+        requested: ['Dungeons of Drakkenheim'],
+        note: 'Provided lines & veils doc in request.',
+      },
+    ],
+    journals: [
+      {
+        id: 'journal-1',
+        title: 'Echoes in the Ruined Observatory',
+        author: 'Marlow',
+        campaign: 'Acroterra',
+        excerpt: 'We followed the flicker of voidlight to the collapsed dome…',
+      },
+      {
+        id: 'journal-2',
+        title: 'Downtime: Brewing Stormglass',
+        author: 'Ser Rowan',
+        campaign: 'Dungeons of Drakkenheim',
+        excerpt: 'Requested three days in the laboratory with Doc Saffron.',
+      },
+    ],
+    updates: [
+      {
+        id: 'update-1',
+        character: 'Ser Rowan',
+        player: 'Gideon',
+        type: 'Bio & portrait refresh',
+        detail: 'Updated oath to include “Shield the Beacon.”',
+      },
+      {
+        id: 'update-2',
+        character: 'Ezri',
+        player: 'Lena Sunfell',
+        type: 'Secret note for GM',
+        detail: 'Wants to add a whisper about the Starweaver.',
+      },
+    ],
+  },
+  activities: [
+    {
+      id: 'activity-1',
+      label: 'Marlow submitted a journal draft for Acroterra',
+      timeAgo: '12 minutes ago',
+    },
+    {
+      id: 'activity-2',
+      label: 'Doc Saffron uploaded revised map handout',
+      timeAgo: '1 hour ago',
+    },
+    {
+      id: 'activity-3',
+      label: 'Player invite pending: Marq the Bold',
+      timeAgo: 'Earlier today',
+    },
+  ],
+  npcs: [
+    {
+      id: 'npc-1',
+      name: 'Doc Saffron',
+      tags: ['Acroterra', 'Allied Faction'],
+      bio: 'Brilliant artificer who keeps the Skyport humming.',
+      visibility: 'GM-only',
+    },
+    {
+      id: 'npc-2',
+      name: 'The Starweaver',
+      tags: ['Drakkenheim', 'Mystic'],
+      bio: 'Unknown patron pulling threads across the city.',
+      visibility: 'Party',
+    },
+  ],
+  handouts: [
+    {
+      id: 'handout-1',
+      title: 'Map • Shattered Beacon District',
+      tags: ['Acroterra', 'Map'],
+      visibility: 'Party',
+      reveal: 'Reveal at next session',
+    },
+    {
+      id: 'handout-2',
+      title: 'Song of the Night Choir',
+      tags: ['Drakkenheim', 'Lore'],
+      visibility: 'GM-only',
+      reveal: 'Locked until Session 6',
+    },
+  ],
+  locations: [
+    {
+      id: 'location-1',
+      name: 'Skyport Aurum',
+      status: 'Discovered',
+      secrets: 2,
+    },
+    {
+      id: 'location-2',
+      name: 'Vault of Silent Bells',
+      status: 'Hidden',
+      secrets: 5,
+    },
+  ],
+  items: [
+    {
+      id: 'item-1',
+      name: 'Shard of Verdant Dawn',
+      owner: 'Ezri',
+      attunement: 'Required',
+      reveal: 'Shown to party',
+    },
+    {
+      id: 'item-2',
+      name: 'Obsidian Codex',
+      owner: '—',
+      attunement: 'Requires ritual',
+      reveal: 'GM-only',
+    },
+  ],
+  sessions: [
+    {
+      id: 'session-1',
+      campaignId: 'acroterra',
+      label: 'Chapter 12: The Shattered Beacon',
+      date: '2024-10-07T19:00:00-05:00',
+      agenda: ['Recap & sparks', 'Downtime check-ins', 'Explore the Beacon catacombs'],
+      prep: ['Audio cue: Beacon hum', 'Handout: Beacon schematic', 'Scene: Cult ritual clock'],
+      recap: null,
+    },
+    {
+      id: 'session-2',
+      campaignId: 'drakkenheim',
+      label: 'Episode 8: Parliament of Ash',
+      date: '2024-10-16T16:30:00-05:00',
+      agenda: ['Safety check-in', 'Review clues', 'Council negotiation scene'],
+      prep: ['Countdown: Meteor corruption 3/6', 'Scene cards ready', 'NPC voices notes'],
+      recap: 'Party allied with the Hooded Lanterns and secured the oathstone.',
+    },
+  ],
+  quickLinks: {
+    foundry: 'https://foundryvtt.questwithwasem.com',
+    discord: 'https://discord.gg/questwithwasem',
+    dashboards: [{ label: 'Acroterra World', href: 'https://foundryvtt.questwithwasem.com/acroterra' }],
+  },
+  allowlist: ['gideon@questwithwasem.com', 'lena@astralmail.com'],
+  banlist: ['badactor@example.com'],
+};
+
+const navSections = [
+  { id: 'overview', label: 'Dashboard' },
+  { id: 'campaigns', label: 'Campaigns' },
+  { id: 'roster', label: 'Roster & Access' },
+  { id: 'content', label: 'Content Library' },
+  { id: 'sessions', label: 'Sessions' },
+  { id: 'settings', label: 'Settings' },
+];
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`Keeper Dashboard • ${SITE_TITLE}`} description="Private control panel for scheduling and managing adventures." />
+    <BaseHead
+      title={`GM Command Page • ${SITE_TITLE}`}
+      description="Control room for campaigns, approvals, content, and session prep."
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
       if (sessionStorage.getItem('keeperAuth') === '1') {
@@ -75,328 +252,1872 @@ const defaultGames = CAMPAIGNS.map(campaign => ({
       }
     </script>
     <style>
-      :root{
-        --ink:#ffffff;
-        --muted:#e6f2ff;
-        --accent:#a7e0ff;
-        --panel: rgba(8,14,24,.82);
-        --edge: rgba(167,224,255,.25);
-        --shadow: 0 18px 50px rgba(2,4,11,.55);
+      :root {
+        color-scheme: dark;
+        --ink: #f5fbff;
+        --muted: rgba(213, 232, 255, 0.86);
+        --accent: #87d4ff;
+        --accent-strong: #5bb3ff;
+        --panel: rgba(8, 15, 27, 0.82);
+        --panel-soft: rgba(10, 18, 32, 0.65);
+        --edge: rgba(135, 212, 255, 0.32);
+        --edge-strong: rgba(135, 212, 255, 0.6);
+        --shadow: 0 24px 60px rgba(2, 8, 20, 0.6);
+        --good: #5de8b1;
+        --warn: #ffc866;
+        --danger: #ff7c9c;
       }
-      html,body{height:100%;}
-      body{
-        margin:0;
-        color:var(--ink);
-        font:16px/1.6 "Manrope", ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
-        background: radial-gradient(circle at top left, rgba(167,224,255,.16), transparent 60%),
-                    radial-gradient(circle at 80% 20%, rgba(255,140,210,.18), transparent 55%),
-                    #050811;
-      }
-      body::before{
-        content:"";
-        position:fixed;
-        inset:-120px;
-        background:url('/Mountains.png') center/cover no-repeat;
-        filter:blur(14px) brightness(.45);
-        opacity:.55;
-        z-index:0;
-      }
-      .wrap{ position:relative; z-index:1; display:flex; min-height:100dvh; flex-direction:column; }
-      main{ flex:1 1 auto; }
-      .container{ width:min(1360px,96%); margin-inline:auto; }
 
-      .dashboard-head{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:16px;
-        margin-bottom:28px;
+      body {
+        margin: 0;
+        font: 16px/1.6 "Manrope", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% -10%, rgba(135, 212, 255, 0.18), transparent 55%),
+          radial-gradient(circle at 85% 20%, rgba(255, 140, 210, 0.22), transparent 60%),
+          #04060e;
+        min-height: 100vh;
       }
-      .dashboard-head h1{ margin:0; font-size:clamp(26px, 3vw, 36px); }
-      .dashboard-head button{
-        padding:10px 18px;
-        border-radius:999px;
-        border:1px solid rgba(167,224,255,.35);
-        background:transparent;
-        color:#fff;
-        font-weight:600;
-        letter-spacing:.4px;
-        cursor:pointer;
-        transition:background .2s ease, border-color .2s ease;
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -140px;
+        background: url('/Mountains.png') center/cover no-repeat;
+        filter: blur(16px) brightness(0.4);
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: -2;
       }
-      .dashboard-head button:hover,
-      .dashboard-head button:focus-visible{
-        background:rgba(167,224,255,.2);
-        border-color:rgba(167,224,255,.55);
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(135, 212, 255, 0.12), transparent 45%, rgba(255, 165, 200, 0.08) 80%),
+          radial-gradient(circle at 50% 120%, rgba(80, 160, 255, 0.12), transparent 55%);
+        mix-blend-mode: screen;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      header,
+      footer {
+        background: transparent;
+      }
+
+      main {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0 clamp(16px, 3vw, 40px) clamp(72px, 9vw, 96px);
+      }
+
+      .wrap {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(240px, 280px) 1fr;
+        gap: clamp(24px, 4vw, 40px);
+        width: min(1400px, 100%);
+        margin: clamp(32px, 4vw, 48px) auto 0;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: clamp(88px, 12vw, 120px);
+        align-self: start;
+        display: grid;
+        gap: 24px;
+        padding: clamp(18px, 3vw, 24px);
+        border-radius: 28px;
+        border: 1px solid var(--edge);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px) saturate(140%);
+      }
+
+      .sidebar .identity h1 {
+        margin: 0 0 6px;
+        font-size: clamp(20px, 2vw, 26px);
+        letter-spacing: 0.8px;
+      }
+
+      .sidebar .identity p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .nav-list {
+        display: grid;
+        gap: 6px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-link {
+        display: block;
+        padding: 10px 14px;
+        border-radius: 12px;
+        color: inherit;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        transition: background 0.2s ease, border-color 0.2s ease;
+        border: 1px solid transparent;
+      }
+
+      .nav-link:hover,
+      .nav-link:focus-visible {
+        background: rgba(135, 212, 255, 0.12);
+        border-color: rgba(135, 212, 255, 0.18);
+      }
+
+      .nav-link.active {
+        border-color: var(--edge-strong);
+        background: rgba(135, 212, 255, 0.16);
+        color: var(--ink);
+      }
+
+      .nav-foot {
+        display: grid;
+        gap: 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .nav-foot button,
+      .nav-foot a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(135, 212, 255, 0.16);
+        border: 1px solid rgba(135, 212, 255, 0.28);
+        color: inherit;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .nav-foot button:hover,
+      .nav-foot a:hover,
+      .nav-foot button:focus-visible,
+      .nav-foot a:focus-visible {
+        background: rgba(135, 212, 255, 0.24);
+        border-color: rgba(135, 212, 255, 0.4);
+      }
+
+      .content-area {
+        display: grid;
+        gap: clamp(28px, 4vw, 40px);
+      }
+
+      .page-intro {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: clamp(24px, 4vw, 32px);
+        border-radius: 28px;
+        border: 1px solid var(--edge);
+        background: linear-gradient(160deg, rgba(135, 212, 255, 0.14), rgba(66, 100, 160, 0.12));
+        box-shadow: var(--shadow);
+      }
+
+      .page-intro h2 {
+        margin: 0 0 6px;
+        font-size: clamp(24px, 3.2vw, 32px);
+      }
+
+      .page-intro p {
+        margin: 0;
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .intro-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .intro-actions button,
+      .intro-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.35);
+        background: rgba(4, 10, 20, 0.7);
+        color: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .intro-actions button:hover,
+      .intro-actions button:focus-visible,
+      .intro-actions a:hover,
+      .intro-actions a:focus-visible {
+        background: rgba(135, 212, 255, 0.18);
+        border-color: rgba(135, 212, 255, 0.45);
+        transform: translateY(-1px);
+      }
+
+      .module {
+        display: grid;
+        gap: clamp(18px, 3vw, 24px);
+        padding: clamp(24px, 4vw, 32px);
+        border-radius: 26px;
+        border: 1px solid var(--edge);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px) saturate(140%);
+      }
+
+      .module header h3 {
+        margin: 0;
+        font-size: clamp(20px, 2.6vw, 26px);
+      }
+
+      .module header p {
+        margin: 6px 0 0;
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .tile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: clamp(16px, 3vw, 24px);
+      }
+
+      .tile {
+        position: relative;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(135, 212, 255, 0.22);
+        background: var(--panel-soft);
+        display: grid;
+        gap: 8px;
+        min-height: 120px;
+      }
+
+      .tile strong {
+        font-size: 16px;
+      }
+
+      .tile span,
+      .tile p {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .tile .badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        background: rgba(135, 212, 255, 0.16);
+        border: 1px solid rgba(135, 212, 255, 0.28);
+      }
+
+      .module section > h4,
+      .module .subhead {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0.4px;
+      }
+
+      .list {
+        display: grid;
+        gap: 12px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .list-item {
+        border-radius: 18px;
+        padding: 16px 18px;
+        border: 1px solid rgba(135, 212, 255, 0.2);
+        background: rgba(10, 18, 32, 0.72);
+        display: grid;
+        gap: 10px;
+      }
+
+      .list-item header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 14px;
+        justify-content: space-between;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .actions button,
+      .actions a,
+      .list-item button {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(135, 212, 255, 0.26);
+        background: rgba(6, 12, 22, 0.7);
+        color: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+        text-decoration: none;
+      }
+
+      .actions button:hover,
+      .actions button:focus-visible,
+      .actions a:hover,
+      .actions a:focus-visible,
+      .list-item button:hover,
+      .list-item button:focus-visible {
+        background: rgba(135, 212, 255, 0.18);
+        border-color: rgba(135, 212, 255, 0.38);
+      }
+
+      .danger {
+        border-color: rgba(255, 124, 156, 0.5) !important;
+        background: rgba(70, 12, 24, 0.5) !important;
+      }
+
+      .danger:hover,
+      .danger:focus-visible {
+        background: rgba(255, 124, 156, 0.28) !important;
+        border-color: rgba(255, 124, 156, 0.7) !important;
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(135, 212, 255, 0.28);
+        background: rgba(6, 12, 22, 0.7);
+        color: inherit;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      form button[type='submit'] {
+        justify-self: start;
+        padding: 12px 22px;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.45);
+        background: linear-gradient(135deg, rgba(135, 212, 255, 0.85), rgba(120, 160, 255, 0.9));
+        color: #02040c;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 18px 40px rgba(135, 212, 255, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      form button[type='submit']:hover,
+      form button[type='submit']:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 46px rgba(135, 212, 255, 0.45);
+      }
+
+      .split {
+        display: grid;
+        gap: clamp(20px, 3vw, 28px);
+      }
+
+      @media (min-width: 1024px) {
+        .split {
+          grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
+      }
+
+      .campaign-card {
+        display: grid;
+        gap: 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.25);
+        background: rgba(8, 14, 26, 0.78);
+        padding: 18px 20px;
+      }
+
+      .campaign-card header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 16px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(93, 232, 177, 0.14);
+        border: 1px solid rgba(93, 232, 177, 0.4);
+        color: #b6ffe5;
+      }
+
+      .status-pill[data-status='Hiatus'] {
+        background: rgba(255, 200, 102, 0.18);
+        border-color: rgba(255, 200, 102, 0.45);
+        color: #ffe9b6;
+      }
+
+      .status-pill[data-status='Finished'] {
+        background: rgba(135, 212, 255, 0.14);
+        border-color: rgba(135, 212, 255, 0.42);
+        color: #e4f6ff;
+      }
+
+      .campaign-links {
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .campaign-links a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .campaign-links a:hover,
+      .campaign-links a:focus-visible {
+        text-decoration: underline;
+      }
+
+      .queue {
+        display: grid;
+        gap: 14px;
+      }
+
+      .queue .list-item {
+        border-color: rgba(135, 212, 255, 0.3);
+        background: rgba(12, 22, 38, 0.78);
+      }
+
+      .queue .decision {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .queue .decision button {
+        padding: 8px 16px;
+      }
+
+      .queue .decision button[data-action='approve'] {
+        border-color: rgba(93, 232, 177, 0.4);
+        background: rgba(24, 60, 45, 0.6);
+      }
+
+      .queue .decision button[data-action='approve']:hover,
+      .queue .decision button[data-action='approve']:focus-visible {
+        background: rgba(93, 232, 177, 0.36);
+      }
+
+      .queue .decision button[data-action='reject'] {
+        border-color: rgba(255, 124, 156, 0.5);
+        background: rgba(70, 14, 28, 0.6);
+      }
+
+      .queue .decision button[data-action='reject']:hover,
+      .queue .decision button[data-action='reject']:focus-visible {
+        background: rgba(255, 124, 156, 0.32);
+      }
+
+      .queue-empty {
+        padding: 16px 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        letter-spacing: 0.4px;
+        background: rgba(135, 212, 255, 0.16);
+        border: 1px solid rgba(135, 212, 255, 0.26);
+      }
+
+      .content-grid {
+        display: grid;
+        gap: clamp(18px, 3vw, 26px);
+      }
+
+      @media (min-width: 1024px) {
+        .content-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .content-panel {
+        display: grid;
+        gap: 14px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.25);
+        background: rgba(10, 18, 32, 0.72);
+      }
+
+      .content-panel h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .content-panel p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .content-panel form {
+        margin-top: 6px;
+      }
+
+      .content-panel ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .timeline {
+        display: grid;
+        gap: 14px;
+      }
+
+      .timeline-item {
+        border-left: 3px solid rgba(135, 212, 255, 0.4);
+        padding-left: 16px;
+      }
+
+      .timeline-item strong {
+        display: block;
+      }
+
+      .timeline-item span {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .counts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .counts span {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(6, 12, 22, 0.7);
+        border: 1px solid rgba(135, 212, 255, 0.25);
+      }
+
+      .session-grid {
+        display: grid;
+        gap: clamp(18px, 3vw, 24px);
+      }
+
+      @media (min-width: 900px) {
+        .session-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .session-card {
+        display: grid;
+        gap: 12px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.26);
+        background: rgba(10, 18, 32, 0.72);
+      }
+
+      .session-card h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .session-card ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .session-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .session-tools button {
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(135, 212, 255, 0.32);
+        background: rgba(6, 12, 22, 0.7);
+        color: inherit;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .session-tools button:hover,
+      .session-tools button:focus-visible {
+        background: rgba(135, 212, 255, 0.2);
+        border-color: rgba(135, 212, 255, 0.4);
+      }
+
+      .settings-grid {
+        display: grid;
+        gap: clamp(16px, 3vw, 24px);
+      }
+
+      @media (min-width: 900px) {
+        .settings-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .settings-panel {
+        display: grid;
+        gap: 12px;
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.25);
+        background: rgba(10, 18, 32, 0.7);
+      }
+
+      .settings-panel h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .settings-panel p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
       }
 
       .blocked,
-      .dashboard-content{
-        background:var(--panel);
-        border:1px solid var(--edge);
-        border-radius:26px;
-        box-shadow:var(--shadow);
-        padding:32px clamp(20px, 5vw, 42px);
-        margin:64px 0;
+      html.keeper-auth .blocked ~ .workspace,
+      html.keeper-auth .blocked ~ footer {
+        display: none;
       }
-      .blocked{ display:flex; flex-direction:column; gap:16px; text-align:center; }
-      .blocked a{ color:var(--accent); }
 
-      .dashboard-content{ display:none; }
-      html.keeper-auth .dashboard-content{ display:grid; gap:32px; }
-      html.keeper-auth .blocked{ display:none; }
+      html.keeper-auth .blocked {
+        display: none;
+      }
 
-      .manager-grid{ display:grid; gap:28px; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
-      .panel{
-        background:rgba(4,9,18,.78);
-        border:1px solid rgba(167,224,255,.35);
-        border-radius:22px;
-        padding:24px;
-        display:grid;
-        gap:18px;
+      .blocked {
+        margin: clamp(80px, 10vw, 120px) auto;
+        padding: clamp(24px, 6vw, 36px);
+        text-align: center;
+        border-radius: 26px;
+        border: 1px solid var(--edge);
+        background: rgba(6, 12, 22, 0.78);
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 16px;
       }
-      .panel h2{ margin:0; font-size:20px; }
-      .panel p{ margin:0; color:rgba(226,242,255,.8); }
 
-      .game-grid{ display:grid; gap:16px; list-style:none; padding:0; margin:0; }
-      .game-card{
-        background:rgba(12,20,34,.9);
-        border:1px solid rgba(167,224,255,.3);
-        border-radius:18px;
-        padding:20px;
-        display:grid;
-        gap:10px;
+      .blocked a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
       }
-      .game-card h3{ margin:0; font-size:18px; }
-      .game-meta{ display:flex; flex-wrap:wrap; gap:10px; font-size:13px; color:rgba(226,242,255,.8); }
-      .game-meta span{ padding:4px 10px; border-radius:999px; background:rgba(167,224,255,.16); }
-      .game-notes{ margin:0; color:rgba(226,242,255,.8); font-size:14px; }
-      .card-actions{ display:flex; justify-content:flex-end; }
-      .card-actions button{
-        padding:6px 12px;
-        border-radius:999px;
-        border:none;
-        font-size:13px;
-        cursor:pointer;
-        background:rgba(255,120,160,.2);
-        color:#fff;
-        transition:background .2s ease;
-      }
-      .card-actions button:hover,
-      .card-actions button:focus-visible{ background:rgba(255,120,160,.32); }
 
-      form label{ display:grid; gap:6px; font-size:14px; color:rgba(226,242,255,.85); }
-      form input,
-      form textarea,
-      form select{
-        padding:12px 14px;
-        border-radius:12px;
-        border:1px solid rgba(167,224,255,.35);
-        background:rgba(6,9,18,.7);
-        color:#fff;
-        font:inherit;
+      .blocked a:hover,
+      .blocked a:focus-visible {
+        text-decoration: underline;
       }
-      form textarea{ min-height:120px; resize:vertical; }
-      form button[type="submit"]{
-        justify-self:start;
-        padding:10px 20px;
-        border-radius:999px;
-        border:none;
-        font-weight:600;
-        background:linear-gradient(120deg, rgba(167,224,255,.9), rgba(120,140,255,.9));
-        color:#02040b;
-        cursor:pointer;
-        box-shadow:0 16px 32px rgba(167,224,255,.25);
-      }
-      .empty-state{ font-size:14px; color:rgba(226,242,255,.75); }
 
-      @media (max-width:720px){
-        .dashboard-head{ flex-direction:column; align-items:flex-start; }
-        .dashboard-head button{ align-self:flex-end; }
+      @media (max-width: 920px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+          order: 0;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .intro-actions {
+          width: 100%;
+        }
+
+        .intro-actions button,
+        .intro-actions a {
+          flex: 1;
+          justify-content: center;
+        }
+
+        .session-tools {
+          flex-direction: column;
+        }
       }
     </style>
   </head>
   <body>
     <div class="wrap">
       <Header />
-
       <main>
-        <div class="container">
-          <section class="blocked" aria-live="polite">
-            <h1>Keeper access required</h1>
-            <p>This console is reserved for the Quest with Wasem game master. Return to the homepage to request access.</p>
-            <a href="/">Back to the tavern →</a>
-          </section>
+        <section class="blocked" aria-live="polite">
+          <h1>Keeper access required</h1>
+          <p>
+            This console is for the Quest with Wasem game master. Authenticate via the hidden gate on the homepage to enter the
+            command room.
+          </p>
+          <a href="/">Return to the tavern →</a>
+        </section>
 
-          <section class="dashboard-content" aria-labelledby="dashboard-title">
-            <div class="dashboard-head">
-              <h1 id="dashboard-title">Keeper Dashboard</h1>
+        <div class="workspace" data-dashboard hidden>
+          <aside class="sidebar" aria-label="GM navigation">
+            <div class="identity">
+              <h1>GM Command Page</h1>
+              <p>All campaigns. One console.</p>
+            </div>
+            <nav>
+              <ul class="nav-list">
+                {navSections.map((section) => (
+                  <li>
+                    <a class="nav-link" href={`#${section.id}`} data-nav-link={section.id}>
+                      {section.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div class="nav-foot">
+              <button type="button" data-session-mode>Start Session Mode</button>
+              <a href="/player-hub" data-impersonate>Impersonate player view</a>
               <button type="button" data-logout>Log out</button>
             </div>
+          </aside>
 
-            <div class="manager-grid">
-              <article class="panel">
-                <h2>Active & Upcoming Games</h2>
-                <p>Review your tables, tweak details, and archive the ones that conclude.</p>
-                <ul class="game-grid" data-game-list></ul>
-                <p class="empty-state" data-empty-state hidden>No games tracked yet. Add one with the form on the right.</p>
-              </article>
+          <div class="content-area">
+            <section class="page-intro">
+              <div>
+                <h2>Welcome back, Keeper.</h2>
+                <p>
+                  Review tonight’s prep, approve submissions, and keep the realms humming. Everything you need is one click away.
+                </p>
+              </div>
+              <div class="intro-actions">
+                <a href="https://discord.gg/questwithwasem" rel="noreferrer">Open Discord</a>
+                <a href="https://foundryvtt.questwithwasem.com" rel="noreferrer">Jump to Foundry</a>
+              </div>
+            </section>
 
-              <article class="panel">
-                <h2>Create or Update a Listing</h2>
-                <p>Fill in the adventure details below. You can use this for new campaigns or one-shots.</p>
-                <form data-game-form>
-                  <label>
-                    Adventure title
-                    <input type="text" name="title" placeholder="The Whispering Vault" required />
-                  </label>
-                  <label>
-                    Game system
-                    <input type="text" name="system" placeholder="D&D 5e" required />
-                  </label>
-                  <label>
-                    Next session or go-live date
-                    <input type="text" name="nextSession" placeholder="Friday, Oct 18" required />
-                  </label>
-                  <label>
-                    Schedule summary
-                    <input type="text" name="cadence" placeholder="Weekly • Thursdays • 7:00 PM CST" required />
-                  </label>
-                  <label>
-                    Notes for yourself
-                    <textarea name="notes" placeholder="Prep list, player roster, or reminders..."></textarea>
-                  </label>
-                  <button type="submit">Save listing</button>
-                </form>
-              </article>
-            </div>
-          </section>
+            <section id="overview" class="module">
+              <header>
+                <h3>Dashboard</h3>
+                <p>Tonight’s focus, quick links, and the latest from your tables.</p>
+              </header>
+              <div class="tile-grid" data-overview></div>
+              <section>
+                <h4 class="subhead">Recent activity</h4>
+                <ul class="list" data-activity></ul>
+              </section>
+            </section>
+
+            <section id="campaigns" class="module">
+              <header>
+                <h3>Campaigns</h3>
+                <p>Create, clone, or archive campaigns. Track links, cadence, and themes in one place.</p>
+              </header>
+
+              <div class="split">
+                <div class="campaign-stack" data-campaign-list></div>
+                <div class="forms">
+                  <form data-campaign-form>
+                    <h4 class="subhead">Create or update</h4>
+                    <label>
+                      Adventure title
+                      <input type="text" name="title" placeholder="The Whispering Vault" required />
+                    </label>
+                    <label>
+                      Game system
+                      <input type="text" name="system" value="D&D 5e" required />
+                    </label>
+                    <label>
+                      Status
+                      <select name="status">
+                        <option value="Active">Active</option>
+                        <option value="Hiatus">Hiatus</option>
+                        <option value="Finished">Finished</option>
+                      </select>
+                    </label>
+                    <label>
+                      Next session
+                      <input type="text" name="nextSession" placeholder="Friday, Oct 18" />
+                    </label>
+                    <label>
+                      Cadence
+                      <input type="text" name="cadence" placeholder="Weekly • Thursdays • 7:00 PM CST" />
+                    </label>
+                    <label>
+                      Theme art URL
+                      <input type="url" name="themeArt" placeholder="https://.../campaign-art.png" />
+                    </label>
+                    <label>
+                      Foundry world URL
+                      <input type="url" name="vttUrl" placeholder="https://foundryvtt.questwithwasem.com/world" />
+                    </label>
+                    <label>
+                      Discord channel
+                      <input type="url" name="discord" placeholder="https://discord.gg/realm" />
+                    </label>
+                    <label>
+                      Map index link
+                      <input type="url" name="mapIndex" placeholder="https://maps.questwithwasem.com" />
+                    </label>
+                    <label>
+                      Keeper notes
+                      <textarea name="notes" placeholder="Prep list, roster, tone notes..."></textarea>
+                    </label>
+                    <button type="submit">Save campaign</button>
+                  </form>
+                  <div class="templates">
+                    <h4 class="subhead">Clone from template</h4>
+                    <div class="counts" data-templates>
+                      <button type="button" data-template="realm">Realm crawl template</button>
+                      <button type="button" data-template="urban">Urban intrigue template</button>
+                      <button type="button" data-template="oneshot">One-shot template</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="roster" class="module">
+              <header>
+                <h3>Roster &amp; Access</h3>
+                <p>Invite players, approve signups, and keep campaign roles organized.</p>
+              </header>
+
+              <div class="split">
+                <div>
+                  <h4 class="subhead">Pending approvals</h4>
+                  <div class="queue" data-player-queue></div>
+                </div>
+                <div>
+                  <form data-invite-form>
+                    <h4 class="subhead">Invite a player</h4>
+                    <label>
+                      Player email
+                      <input type="email" name="email" placeholder="hero@realms.net" required />
+                    </label>
+                    <label>
+                      Assign to campaign
+                      <select name="campaign">
+                        <option value="">Choose...</option>
+                      </select>
+                    </label>
+                    <label>
+                      Role
+                      <select name="role">
+                        <option value="Player">Player</option>
+                        <option value="Spectator">Spectator</option>
+                        <option value="Co-GM">Co-GM</option>
+                      </select>
+                    </label>
+                    <label>
+                      Personal note
+                      <textarea name="note" placeholder="Session zero availability, safety tools check, etc."></textarea>
+                    </label>
+                    <button type="submit">Send invitation</button>
+                  </form>
+                  <div class="allowlists">
+                    <h4 class="subhead">Access lists</h4>
+                    <p>Allowlist ensures signups must match; banlist blocks troublemakers realms-wide.</p>
+                    <div class="chips" data-allowlist></div>
+                    <div class="chips" data-banlist></div>
+                  </div>
+                </div>
+              </div>
+
+              <section>
+                <h4 class="subhead">Player submissions</h4>
+                <div class="split">
+                  <div>
+                    <h5>Journal review</h5>
+                    <div class="queue" data-journal-queue></div>
+                  </div>
+                  <div>
+                    <h5>Character updates</h5>
+                    <div class="queue" data-update-queue></div>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section id="content" class="module">
+              <header>
+                <h3>Content Library</h3>
+                <p>Manage NPC dossiers, handouts, journals, locations, and artifacts with reveal controls.</p>
+              </header>
+              <div class="content-grid">
+                <article class="content-panel" data-npc-panel>
+                  <h4>NPCs</h4>
+                  <p>Track visibility, tags, and quick notes. Reveal instantly or plan for future sessions.</p>
+                  <ul data-npc-list></ul>
+                  <form data-npc-form>
+                    <label>
+                      Name
+                      <input type="text" name="name" placeholder="Captain Aiyra" required />
+                    </label>
+                    <label>
+                      Tags (comma separated)
+                      <input type="text" name="tags" placeholder="Acroterra, Faction" />
+                    </label>
+                    <label>
+                      Visibility
+                      <select name="visibility">
+                        <option value="GM-only">GM-only</option>
+                        <option value="Party">Party</option>
+                        <option value="Specific players">Specific players</option>
+                        <option value="Public">Public</option>
+                      </select>
+                    </label>
+                    <label>
+                      Notes
+                      <textarea name="notes" placeholder="Short bio or secrets"></textarea>
+                    </label>
+                    <label>
+                      Reveal at session
+                      <input type="text" name="reveal" placeholder="Reveal now / Session 8" />
+                    </label>
+                    <button type="submit">Add NPC</button>
+                  </form>
+                </article>
+                <article class="content-panel" data-handout-panel>
+                  <h4>Handouts</h4>
+                  <p>Upload files, plan reveals, and keep audiences straight.</p>
+                  <ul data-handout-list></ul>
+                  <form data-handout-form>
+                    <label>
+                      Title
+                      <input type="text" name="title" placeholder="Ancient Decree" required />
+                    </label>
+                    <label>
+                      Tags
+                      <input type="text" name="tags" placeholder="Lore, Prophecy" />
+                    </label>
+                    <label>
+                      Visibility
+                      <select name="visibility">
+                        <option value="GM-only">GM-only</option>
+                        <option value="Party">Party</option>
+                        <option value="Specific players">Specific players</option>
+                        <option value="Public">Public</option>
+                      </select>
+                    </label>
+                    <label>
+                      Reveal timing
+                      <input type="text" name="reveal" placeholder="Reveal at session X" />
+                    </label>
+                    <button type="submit">Save handout</button>
+                  </form>
+                </article>
+                <article class="content-panel" data-location-panel>
+                  <h4>Locations</h4>
+                  <p>Track discovered flags, secrets, and quest ties.</p>
+                  <ul data-location-list></ul>
+                  <form data-location-form>
+                    <label>
+                      Location name
+                      <input type="text" name="name" placeholder="Vault of Silent Bells" required />
+                    </label>
+                    <label>
+                      Status
+                      <select name="status">
+                        <option value="Discovered">Discovered</option>
+                        <option value="Hidden">Hidden</option>
+                        <option value="Rumored">Rumored</option>
+                      </select>
+                    </label>
+                    <label>
+                      Secrets tracked
+                      <input type="number" name="secrets" min="0" value="0" />
+                    </label>
+                    <button type="submit">Log location</button>
+                  </form>
+                </article>
+                <article class="content-panel" data-item-panel>
+                  <h4>Items &amp; Artifacts</h4>
+                  <p>Follow attunement, owners, and reveal progress.</p>
+                  <ul data-item-list></ul>
+                  <form data-item-form>
+                    <label>
+                      Item name
+                      <input type="text" name="name" placeholder="Relic of Dawn" required />
+                    </label>
+                    <label>
+                      Owner
+                      <input type="text" name="owner" placeholder="Assigned hero" />
+                    </label>
+                    <label>
+                      Attunement
+                      <input type="text" name="attunement" placeholder="Requires ritual" />
+                    </label>
+                    <label>
+                      Reveal notes
+                      <input type="text" name="reveal" placeholder="Reveal when attuned" />
+                    </label>
+                    <button type="submit">Track item</button>
+                  </form>
+                </article>
+              </div>
+            </section>
+
+            <section id="sessions" class="module">
+              <header>
+                <h3>Sessions</h3>
+                <p>Prep agendas, keep clocks visible, and capture recaps once the tale concludes.</p>
+              </header>
+              <div class="session-grid" data-session-list></div>
+            </section>
+
+            <section id="settings" class="module">
+              <header>
+                <h3>Settings</h3>
+                <p>Tailor theme, categories, safety tools, and integrations for each realm.</p>
+              </header>
+              <div class="settings-grid">
+                <article class="settings-panel">
+                  <h4>Campaign theming</h4>
+                  <p>Assign palette, fonts, and background sigils per campaign.</p>
+                  <form data-theme-form>
+                    <label>
+                      Select campaign
+                      <select name="campaign"></select>
+                    </label>
+                    <label>
+                      Accent color
+                      <input type="color" name="color" value="#87d4ff" />
+                    </label>
+                    <label>
+                      Typeface
+                      <select name="font">
+                        <option value="Manrope">Manrope</option>
+                        <option value="EB Garamond">EB Garamond</option>
+                        <option value="IM Fell">IM Fell</option>
+                      </select>
+                    </label>
+                    <button type="submit">Apply theme</button>
+                  </form>
+                </article>
+                <article class="settings-panel">
+                  <h4>Content categories</h4>
+                  <p>Define tags and folders for NPCs, handouts, and journals.</p>
+                  <form data-category-form>
+                    <label>
+                      Category name
+                      <input type="text" name="name" placeholder="Factions" />
+                    </label>
+                    <label>
+                      Applies to
+                      <select name="scope">
+                        <option value="NPCs">NPCs</option>
+                        <option value="Handouts">Handouts</option>
+                        <option value="Journal">Journal</option>
+                        <option value="Locations">Locations</option>
+                        <option value="Items">Items</option>
+                      </select>
+                    </label>
+                    <button type="submit">Add category</button>
+                  </form>
+                </article>
+                <article class="settings-panel">
+                  <h4>Safety tools</h4>
+                  <p>Surface support resources and check-in cards every session.</p>
+                  <form data-safety-form>
+                    <label>
+                      Safety tools page URL
+                      <input type="url" name="url" placeholder="https://..." />
+                    </label>
+                    <button type="submit">Update link</button>
+                  </form>
+                </article>
+                <article class="settings-panel">
+                  <h4>Integrations &amp; backups</h4>
+                  <p>Send Discord pings, configure webhooks, and export campaign vaults.</p>
+                  <form data-webhook-form>
+                    <label>
+                      Discord webhook
+                      <input type="url" name="discord" placeholder="https://discord.com/api/..." />
+                    </label>
+                    <label>
+                      Approvals channel
+                      <input type="text" name="channel" placeholder="#acroterra-approvals" />
+                    </label>
+                    <button type="submit">Save webhook</button>
+                  </form>
+                  <form data-backup-form>
+                    <label>
+                      Export campaign
+                      <select name="campaign"></select>
+                    </label>
+                    <button type="submit">Generate JSON backup</button>
+                  </form>
+                </article>
+              </div>
+            </section>
+          </div>
         </div>
       </main>
-
       <Footer />
     </div>
 
-    <script type="application/json" id="keeper-defaults">{JSON.stringify(defaultGames)}</script>
+    <script type="application/json" id="keeper-defaults">{JSON.stringify(defaultState)}</script>
     <script is:inline>
       const authActive = document.documentElement.classList.contains('keeper-auth');
-      if (!authActive) {
-        sessionStorage.removeItem('keeperAuth');
-      }
-
+      const dashboard = document.querySelector('[data-dashboard]');
       const logoutButton = document.querySelector('[data-logout]');
+
       logoutButton?.addEventListener('click', () => {
         sessionStorage.removeItem('keeperAuth');
         window.location.href = '/';
       });
 
       if (!authActive) {
+        sessionStorage.removeItem('keeperAuth');
+        dashboard?.setAttribute('hidden', '');
         return;
       }
 
-      const STORAGE_KEY = 'keeperGames';
-      const defaultsEl = document.getElementById('keeper-defaults');
-      const listEl = document.querySelector('[data-game-list]');
-      const emptyState = document.querySelector('[data-empty-state]');
-      const form = document.querySelector('[data-game-form]');
-      const createId = () => {
-        if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-          return crypto.randomUUID();
-        }
-        return `game-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      };
+      dashboard?.removeAttribute('hidden');
 
+      const STORAGE_KEY = 'keeperControlRoom';
+      const defaultsEl = document.getElementById('keeper-defaults');
       const parseDefaults = () => {
-        if (!defaultsEl) return [];
+        if (!defaultsEl) return {};
         try {
-          return JSON.parse(defaultsEl.textContent || '[]');
+          return JSON.parse(defaultsEl.textContent || '{}');
         } catch (error) {
           console.warn('Failed to parse defaults', error);
-          return [];
+          return {};
         }
       };
 
-      const loadGames = () => {
+      const loadState = () => {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          try {
-            return JSON.parse(stored);
-          } catch (error) {
-            console.warn('Failed to parse stored games', error);
-          }
+        if (!stored) {
+          const defaults = parseDefaults();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+          return defaults;
         }
-        const defaults = parseDefaults();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-        return defaults;
+        try {
+          return JSON.parse(stored);
+        } catch (error) {
+          console.warn('Failed to parse stored state', error);
+          const defaults = parseDefaults();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+          return defaults;
+        }
       };
 
-      let games = loadGames();
+      let state = loadState();
 
       const persist = () => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       };
 
-      const renderGames = () => {
-        if (!listEl || !emptyState) return;
-        listEl.innerHTML = '';
-        if (games.length === 0) {
-          emptyState.hidden = false;
+      const navLinks = Array.from(document.querySelectorAll('[data-nav-link]'));
+      const sections = navLinks
+        .map((link) => document.getElementById(link.dataset.navLink || ''))
+        .filter((el) => el);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const id = entry.target.id;
+            const link = navLinks.find((item) => item.dataset.navLink === id);
+            if (!link) return;
+            if (entry.isIntersecting) {
+              navLinks.forEach((el) => el.classList.remove('active'));
+              link.classList.add('active');
+            }
+          });
+        },
+        { rootMargin: '-40% 0px -55% 0px', threshold: 0.1 }
+      );
+
+      sections.forEach((section) => observer.observe(section));
+
+      const scrollSmoothly = (event) => {
+        if (!(event.target instanceof HTMLAnchorElement)) return;
+        const id = event.target.getAttribute('href')?.replace('#', '');
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', `#${id}`);
+      };
+
+      document
+        .querySelector('.sidebar nav')
+        ?.addEventListener('click', scrollSmoothly);
+
+      const renderOverview = () => {
+        const container = document.querySelector('[data-overview]');
+        if (!container) return;
+        container.innerHTML = '';
+        const tiles = [];
+
+        const campaigns = state.campaigns || [];
+        const approvals = state.approvals || {};
+        const nextSession = campaigns[0]?.nextSession || 'Set a date';
+
+        tiles.push({
+          title: 'Tonight\'s session',
+          body: nextSession,
+          badge: campaigns[0]?.title ? campaigns[0].title : 'No campaign',
+        });
+
+        const pendingPlayers = approvals.players?.length || 0;
+        const pendingJournals = approvals.journals?.length || 0;
+        const pendingUpdates = approvals.updates?.length || 0;
+
+        tiles.push({
+          title: 'Approvals awaiting you',
+          body: `${pendingPlayers} player${pendingPlayers === 1 ? '' : 's'}, ${pendingJournals} journal${
+            pendingJournals === 1 ? '' : 's'
+          }, ${pendingUpdates} update${pendingUpdates === 1 ? '' : 's'}`,
+          badge: 'Queue',
+        });
+
+        tiles.push({
+          title: 'Quick links',
+          body: 'Foundry • Discord • Session vault',
+          badge: 'Teleport',
+        });
+
+        tiles.push({
+          title: 'Safety reminder',
+          body: 'Check-in at break & highlight lines/veils updates.',
+          badge: 'Table care',
+        });
+
+        tiles.forEach((tile) => {
+          const div = document.createElement('div');
+          div.className = 'tile';
+          div.innerHTML = `
+            <span class="badge">${tile.badge}</span>
+            <strong>${tile.title}</strong>
+            <span>${tile.body}</span>
+          `;
+          container.appendChild(div);
+        });
+      };
+
+      const renderActivity = () => {
+        const container = document.querySelector('[data-activity]');
+        if (!container) return;
+        container.innerHTML = '';
+        const activities = state.activities || [];
+        if (!activities.length) {
+          const empty = document.createElement('li');
+          empty.className = 'queue-empty';
+          empty.textContent = 'All quiet. Scrying pool is calm.';
+          container.appendChild(empty);
           return;
         }
-        emptyState.hidden = true;
-        const fragment = document.createDocumentFragment();
-        games.forEach((game, index) => {
+        activities.forEach((activity) => {
           const item = document.createElement('li');
-          item.className = 'game-card';
-          item.dataset.index = String(index);
+          item.className = 'list-item';
           item.innerHTML = `
-            <h3>${game.title}</h3>
-            <div class="game-meta">
-              <span>${game.system}</span>
-              <span>${game.cadence}</span>
-              <span>Next: ${game.nextSession}</span>
+            <header>
+              <strong>${activity.label}</strong>
+              <span class="meta">${activity.timeAgo}</span>
+            </header>
+          `;
+          container.appendChild(item);
+        });
+      };
+
+      const campaignList = document.querySelector('[data-campaign-list]');
+      const inviteForm = document.querySelector('[data-invite-form]');
+      const campaignForm = document.querySelector('[data-campaign-form]');
+      const templateButtons = document.querySelector('[data-templates]');
+
+      const renderCampaigns = () => {
+        if (!campaignList) return;
+        campaignList.innerHTML = '';
+        const campaigns = state.campaigns || [];
+        if (!campaigns.length) {
+          const empty = document.createElement('p');
+          empty.className = 'queue-empty';
+          empty.textContent = 'No campaigns yet. Forge a new world with the form on the right.';
+          campaignList.appendChild(empty);
+          return;
+        }
+        campaigns.forEach((campaign, index) => {
+          const card = document.createElement('article');
+          card.className = 'campaign-card';
+          card.innerHTML = `
+            <header>
+              <div>
+                <h4>${campaign.title}</h4>
+                <div class="meta">
+                  <span>${campaign.system}</span>
+                  <span>${campaign.cadence || 'Cadence TBD'}</span>
+                </div>
+              </div>
+              <span class="status-pill" data-status="${campaign.status || 'Active'}">${campaign.status || 'Active'}</span>
+            </header>
+            <p>${campaign.notes || 'No keeper notes yet.'}</p>
+            <div class="campaign-links">
+              ${campaign.nextSession ? `<span>Next session: ${campaign.nextSession}</span>` : ''}
+              ${campaign.vttUrl ? `<a href="${campaign.vttUrl}" target="_blank" rel="noreferrer">Foundry world</a>` : ''}
+              ${campaign.discord ? `<a href="${campaign.discord}" target="_blank" rel="noreferrer">Discord channel</a>` : ''}
+              ${campaign.mapIndex ? `<a href="${campaign.mapIndex}" target="_blank" rel="noreferrer">Map index</a>` : ''}
             </div>
-            <p class="game-notes">${game.notes || 'No additional notes yet.'}</p>
-            <div class="card-actions">
-              <button type="button" data-remove="${index}">Archive</button>
+            <div class="actions">
+              <button type="button" data-clone="${campaign.id}">Clone</button>
+              <button type="button" data-status="${index}">${campaign.status === 'Active' ? 'Mark hiatus' : 'Mark active'}</button>
+              <button type="button" class="danger" data-remove="${campaign.id}">Archive</button>
             </div>
           `;
-          fragment.appendChild(item);
+          campaignList.appendChild(card);
         });
-        listEl.appendChild(fragment);
       };
 
-      renderGames();
+      const renderQueues = () => {
+        const playerContainer = document.querySelector('[data-player-queue]');
+        const journalContainer = document.querySelector('[data-journal-queue]');
+        const updateContainer = document.querySelector('[data-update-queue]');
 
-      listEl?.addEventListener('click', (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-        const removeIndex = target.dataset.remove;
-        if (removeIndex === undefined) return;
-        const index = Number.parseInt(removeIndex, 10);
-        if (Number.isNaN(index)) return;
-        games.splice(index, 1);
-        persist();
-        renderGames();
-      });
+        const renderQueue = (container, queue, emptyMessage) => {
+          if (!container) return;
+          container.innerHTML = '';
+          if (!queue?.length) {
+            const empty = document.createElement('p');
+            empty.className = 'queue-empty';
+            empty.textContent = emptyMessage;
+            container.appendChild(empty);
+            return;
+          }
+          queue.forEach((entry) => {
+            const item = document.createElement('article');
+            item.className = 'list-item';
+            item.dataset.entryId = entry.id;
+            if (entry.email) {
+              item.innerHTML = `
+                <header>
+                  <div>
+                    <strong>${entry.name}</strong>
+                    <div class="meta">
+                      <span>${entry.email}</span>
+                      <span>Requests: ${(entry.requested || []).join(', ') || '—'}</span>
+                    </div>
+                  </div>
+                </header>
+                <p>${entry.note || 'Awaiting your decision.'}</p>
+                <div class="decision">
+                  <button type="button" data-action="approve">Approve</button>
+                  <button type="button" data-action="reject">Request changes</button>
+                </div>
+              `;
+            } else if (entry.title) {
+              item.innerHTML = `
+                <header>
+                  <div>
+                    <strong>${entry.title}</strong>
+                    <div class="meta">
+                      <span>${entry.author}</span>
+                      <span>${entry.campaign}</span>
+                    </div>
+                  </div>
+                </header>
+                <p>${entry.excerpt || 'No summary provided.'}</p>
+                <div class="decision">
+                  <button type="button" data-action="approve">Approve</button>
+                  <button type="button" data-action="reject">Request edits</button>
+                </div>
+              `;
+            } else {
+              item.innerHTML = `
+                <header>
+                  <div>
+                    <strong>${entry.character}</strong>
+                    <div class="meta">
+                      <span>${entry.player}</span>
+                      <span>${entry.type}</span>
+                    </div>
+                  </div>
+                </header>
+                <p>${entry.detail || 'Awaiting review.'}</p>
+                <div class="decision">
+                  <button type="button" data-action="approve">Approve</button>
+                  <button type="button" data-action="reject">Follow up</button>
+                </div>
+              `;
+            }
+            container.appendChild(item);
+          });
+        };
 
-      form?.addEventListener('submit', (event) => {
-        event.preventDefault();
-        if (!form) return;
-        const formData = new FormData(form);
-        const title = String(formData.get('title') || '').trim();
-        const system = String(formData.get('system') || '').trim();
-        const nextSession = String(formData.get('nextSession') || '').trim();
-        const cadence = String(formData.get('cadence') || '').trim();
-        const notes = String(formData.get('notes') || '').trim();
-        if (!title || !system || !nextSession || !cadence) {
+        renderQueue(playerContainer, state.approvals?.players, 'No player requests.');
+        renderQueue(journalContainer, state.approvals?.journals, 'No journal submissions.');
+        renderQueue(updateContainer, state.approvals?.updates, 'No character updates.');
+      };
+
+      const renderChips = () => {
+        const allowContainer = document.querySelector('[data-allowlist]');
+        const banContainer = document.querySelector('[data-banlist]');
+        if (allowContainer) {
+          allowContainer.innerHTML = '<span class="chip">Allowlist</span>';
+          (state.allowlist || []).forEach((entry) => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.textContent = entry;
+            allowContainer.appendChild(chip);
+          });
+        }
+        if (banContainer) {
+          banContainer.innerHTML = '<span class="chip">Banlist</span>';
+          (state.banlist || []).forEach((entry) => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.textContent = entry;
+            banContainer.appendChild(chip);
+          });
+        }
+      };
+
+      const renderContent = () => {
+        const npcList = document.querySelector('[data-npc-list]');
+        const handoutList = document.querySelector('[data-handout-list]');
+        const locationList = document.querySelector('[data-location-list]');
+        const itemList = document.querySelector('[data-item-list]');
+
+        const renderList = (container, list, formatter, emptyMessage) => {
+          if (!container) return;
+          container.innerHTML = '';
+          if (!list?.length) {
+            const empty = document.createElement('li');
+            empty.textContent = emptyMessage;
+            container.appendChild(empty);
+            return;
+          }
+          list.forEach((entry) => {
+            const li = document.createElement('li');
+            li.innerHTML = formatter(entry);
+            container.appendChild(li);
+          });
+        };
+
+        renderList(
+          npcList,
+          state.npcs,
+          (npc) => `
+            <strong>${npc.name}</strong>
+            <div>${(npc.tags || []).join(', ') || 'No tags yet.'}</div>
+            <div>Visibility: ${npc.visibility}</div>
+            ${npc.bio ? `<div>${npc.bio}</div>` : ''}
+          `,
+          'No NPCs logged yet.'
+        );
+
+        renderList(
+          handoutList,
+          state.handouts,
+          (handout) => `
+            <strong>${handout.title}</strong>
+            <div>${(handout.tags || []).join(', ') || 'No tags yet.'}</div>
+            <div>Audience: ${handout.visibility}</div>
+            <div>${handout.reveal || 'Reveal when ready.'}</div>
+          `,
+          'No handouts prepped yet.'
+        );
+
+        renderList(
+          locationList,
+          state.locations,
+          (location) => `
+            <strong>${location.name}</strong>
+            <div>Status: ${location.status}</div>
+            <div>Secrets tracked: ${location.secrets ?? 0}</div>
+          `,
+          'No locations catalogued.'
+        );
+
+        renderList(
+          itemList,
+          state.items,
+          (item) => `
+            <strong>${item.name}</strong>
+            <div>Owner: ${item.owner || 'Unclaimed'}</div>
+            <div>Attunement: ${item.attunement || 'None'}</div>
+            <div>${item.reveal || 'Reveal flow TBD.'}</div>
+          `,
+          'No artifacts recorded yet.'
+        );
+      };
+
+      const renderSessions = () => {
+        const container = document.querySelector('[data-session-list]');
+        if (!container) return;
+        container.innerHTML = '';
+        const sessions = state.sessions || [];
+        if (!sessions.length) {
+          const empty = document.createElement('p');
+          empty.className = 'queue-empty';
+          empty.textContent = 'No sessions scheduled. Add one to kick off the adventure.';
+          container.appendChild(empty);
           return;
         }
-        games.unshift({ id: createId(), title, system, nextSession, cadence, notes });
+        sessions.forEach((session) => {
+          const card = document.createElement('article');
+          card.className = 'session-card';
+          const date = session.date ? new Date(session.date).toLocaleString() : 'TBD';
+          card.innerHTML = `
+            <div class="meta">
+              <span>${date}</span>
+              <span>${session.campaignId}</span>
+            </div>
+            <h4>${session.label}</h4>
+            <div>
+              <strong>Agenda</strong>
+              <ul>${(session.agenda || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
+            <div>
+              <strong>Prep notes</strong>
+              <ul>${(session.prep || []).map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
+            ${session.recap ? `<p><strong>Recap:</strong> ${session.recap}</p>` : ''}
+            <div class="session-tools">
+              <button type="button" data-show="handouts">Handouts</button>
+              <button type="button" data-show="music">Music cue</button>
+              <button type="button" data-show="clocks">Countdowns</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      };
+
+      const populateSelects = () => {
+        const campaignOptions = state.campaigns || [];
+        const inviteSelect = inviteForm?.querySelector('select[name="campaign"]');
+        const themeSelect = document.querySelector('[data-theme-form] select[name="campaign"]');
+        const backupSelect = document.querySelector('[data-backup-form] select[name="campaign"]');
+        [inviteSelect, themeSelect, backupSelect].forEach((select) => {
+          if (!select) return;
+          select.innerHTML = '<option value="">Choose...</option>';
+          campaignOptions.forEach((campaign) => {
+            const option = document.createElement('option');
+            option.value = campaign.id;
+            option.textContent = campaign.title;
+            select.appendChild(option);
+          });
+        });
+      };
+
+      const handleDecision = (queueName, id, approved) => {
+        const queue = state.approvals?.[queueName];
+        if (!Array.isArray(queue)) return;
+        const index = queue.findIndex((entry) => entry.id === id);
+        if (index === -1) return;
+        queue.splice(index, 1);
+        const message = approved ? 'Approved' : 'Sent for revision';
+        state.activities = [
+          { id: `${queueName}-${Date.now()}`, label: `${message}: ${id}`, timeAgo: 'Just now' },
+          ...(state.activities || []),
+        ].slice(0, 6);
         persist();
-        renderGames();
-        form.reset();
+        renderQueues();
+        renderActivity();
+        renderOverview();
+      };
+
+      campaignList?.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const cloneId = target.dataset.clone;
+        const removeId = target.dataset.remove;
+        const statusIndex = target.dataset.status;
+
+        if (cloneId) {
+          const found = (state.campaigns || []).find((campaign) => campaign.id === cloneId);
+          if (!found) return;
+          const copy = { ...found, id: `${found.id}-copy-${Date.now()}`, title: `${found.title} (Clone)` };
+          state.campaigns = [copy, ...state.campaigns];
+          persist();
+          renderCampaigns();
+          populateSelects();
+          renderOverview();
+          return;
+        }
+
+        if (removeId) {
+          state.campaigns = (state.campaigns || []).filter((campaign) => campaign.id !== removeId);
+          persist();
+          renderCampaigns();
+          populateSelects();
+          renderOverview();
+          return;
+        }
+
+        if (statusIndex !== undefined) {
+          const index = Number.parseInt(statusIndex, 10);
+          if (Number.isNaN(index)) return;
+          const campaign = state.campaigns?.[index];
+          if (!campaign) return;
+          campaign.status = campaign.status === 'Active' ? 'Hiatus' : 'Active';
+          persist();
+          renderCampaigns();
+          return;
+        }
       });
+
+      templateButtons?.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLButtonElement)) return;
+        const template = target.dataset.template;
+        const templates = {
+          realm: {
+            title: 'Untamed Frontier',
+            system: 'D&D 5e',
+            status: 'Active',
+            cadence: 'Biweekly • Sundays • 6:00 PM CST',
+            nextSession: 'Sunday, Oct 13',
+            notes: 'Hex crawl, strong wilderness survival themes.',
+          },
+          urban: {
+            title: 'Shadow Markets of Virel',
+            system: 'D&D 5e',
+            status: 'Hiatus',
+            cadence: 'Monthly • Fridays • 8:00 PM CST',
+            nextSession: 'Friday, Nov 8',
+            notes: 'Intrigue-heavy. Prepare faction clocks and rumors.',
+          },
+          oneshot: {
+            title: 'The Archivist\'s Lament',
+            system: 'D&D 5e',
+            status: 'Active',
+            cadence: 'One-shot • 3 hours',
+            nextSession: 'TBD',
+            notes: 'Mystery puzzle box; includes pregens.',
+          },
+        };
+        const payload = templates[template];
+        if (!payload) return;
+        state.campaigns = [{ id: `${template}-${Date.now()}`, ...payload }, ...(state.campaigns || [])];
+        persist();
+        renderCampaigns();
+        populateSelects();
+        renderOverview();
+      });
+
+      campaignForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(campaignForm);
+        const title = String(formData.get('title') || '').trim();
+        if (!title) return;
+        const campaign = {
+          id: `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`,
+          title,
+          system: String(formData.get('system') || 'D&D 5e'),
+          status: String(formData.get('status') || 'Active'),
+          nextSession: String(formData.get('nextSession') || ''),
+          cadence: String(formData.get('cadence') || ''),
+          themeArt: String(formData.get('themeArt') || ''),
+          vttUrl: String(formData.get('vttUrl') || ''),
+          discord: String(formData.get('discord') || ''),
+          mapIndex: String(formData.get('mapIndex') || ''),
+          notes: String(formData.get('notes') || ''),
+        };
+        state.campaigns = [campaign, ...(state.campaigns || [])];
+        persist();
+        campaignForm.reset();
+        renderCampaigns();
+        populateSelects();
+        renderOverview();
+      });
+
+      inviteForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(inviteForm);
+        const email = String(formData.get('email') || '').trim();
+        if (!email) return;
+        state.allowlist = Array.from(new Set([...(state.allowlist || []), email]));
+        state.activities = [
+          { id: `invite-${Date.now()}`, label: `Invite sent to ${email}`, timeAgo: 'Just now' },
+          ...(state.activities || []),
+        ].slice(0, 6);
+        persist();
+        inviteForm.reset();
+        renderChips();
+        renderActivity();
+      });
+
+      const bindQueue = (selector, queueName) => {
+        document.querySelector(selector)?.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) return;
+          const action = target.dataset.action;
+          if (!action) return;
+          const entryId = target.closest('[data-entry-id]')?.dataset.entryId;
+          if (!entryId) return;
+          handleDecision(queueName, entryId, action === 'approve');
+        });
+      };
+
+      bindQueue('[data-player-queue]', 'players');
+      bindQueue('[data-journal-queue]', 'journals');
+      bindQueue('[data-update-queue]', 'updates');
+
+      const handleContentForm = (selector, key) => {
+        const form = document.querySelector(selector);
+        form?.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const entry = Object.fromEntries(formData.entries());
+          entry.id = `${key}-${Date.now()}`;
+          ['tags'].forEach((field) => {
+            if (entry[field]) {
+              entry[field] = String(entry[field])
+                .split(',')
+                .map((value) => value.trim())
+                .filter(Boolean);
+            }
+          });
+          state[key] = [entry, ...(state[key] || [])];
+          persist();
+          form.reset();
+          renderContent();
+        });
+      };
+
+      handleContentForm('[data-npc-form]', 'npcs');
+      handleContentForm('[data-handout-form]', 'handouts');
+      handleContentForm('[data-location-form]', 'locations');
+      handleContentForm('[data-item-form]', 'items');
+
+      const renderSessionMode = () => {
+        const button = document.querySelector('[data-session-mode]');
+        button?.addEventListener('click', () => {
+          const activeSession = state.sessions?.[0];
+          if (!activeSession) {
+            alert('No sessions scheduled. Add one in the Sessions section.');
+            return;
+          }
+          alert(`Session mode armed for ${activeSession.label}. Quick toggles ready for handouts, music, and clocks.`);
+        });
+      };
+
+      document.querySelector('[data-theme-form]')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert('Theme updated. Players will see the new palette at next refresh.');
+      });
+
+      document.querySelector('[data-category-form]')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert('Category added to your taxonomy.');
+      });
+
+      document.querySelector('[data-safety-form]')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert('Safety tools link updated.');
+      });
+
+      document.querySelector('[data-webhook-form]')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert('Discord webhook saved.');
+      });
+
+      document.querySelector('[data-backup-form]')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        alert('Backup queued. You will receive a download link shortly.');
+      });
+
+      renderOverview();
+      renderActivity();
+      renderCampaigns();
+      renderQueues();
+      renderChips();
+      renderContent();
+      renderSessions();
+      populateSelects();
+      renderSessionMode();
     </script>
   </body>
 </html>
