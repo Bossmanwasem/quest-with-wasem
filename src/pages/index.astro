@@ -90,103 +90,240 @@ const oneShots = ONE_SHOTS;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root{
-        --ink:#ffffff;
-        --muted:#ffffff;
-        --accent:#a7e0ff;
-        --panel: rgba(0,0,0,.5);
-        --edge: rgba(255,255,255,.15);
-        --shadow: 0 10px 30px rgba(0,0,0,.35);
-        --backdrop: blur(8px);
+        --ink:#f7fbff;
+        --muted:#eaf4ff;
+        --accent:#b8e4ff;
+        --panel: rgba(8,16,30,.65);
+        --edge: rgba(210,234,255,.28);
+        --shadow: 0 12px 36px rgba(2,6,18,.45);
+        --backdrop: blur(10px);
       }
       html,body{height:100%}
       body{
         margin:0;
         color:var(--ink);
-        font:16px/1.6 ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
-        background: #0b0f1a url('/Mountains.png') center/cover no-repeat fixed;
+        font:16px/1.6 "Manrope", ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background: radial-gradient(circle at top, rgba(167,224,255,.12), transparent 55%),
+                    radial-gradient(circle at 20% 120%, rgba(180,108,255,.18), transparent 60%),
+                    #060914;
+        overflow-x:hidden;
       }
 
-      .wrap{ position:relative; z-index:1; display:flex; min-height:100dvh; flex-direction:column; }
-      main{ flex:1 1 auto; }
-      .container{ width:min(1200px,92%); margin-inline:auto; }
+      body::before{
+        content:"";
+        position:fixed;
+        inset:-120px;
+        background:url('/Mountains.png') center/cover no-repeat;
+        filter:blur(14px) brightness(.65);
+        opacity:.65;
+        z-index:0;
+      }
 
-      .hero{ padding: clamp(56px, 8vw, 96px) 0 24px; text-align:center; }
-      .title{ margin:0 0 8px; font-size: clamp(28px, 5vw, 56px); line-height:1.1; letter-spacing:.5px; color:#fff; }
+      body::after{
+        content:"";
+        position:fixed;
+        inset:0;
+        background:linear-gradient(120deg, rgba(167,224,255,.14), rgba(95,173,255,.04) 30%, transparent 60%),
+                   radial-gradient(circle at 75% -10%, rgba(255,120,200,.12), transparent 55%);
+        mix-blend-mode:screen;
+        pointer-events:none;
+        z-index:0;
+      }
+
+      .wrap{ position:relative; z-index:1; display:flex; min-height:100dvh; flex-direction:column; backdrop-filter:saturate(150%); }
+      main{ flex:1 1 auto; }
+      .container{ width:min(1520px,95%); margin-inline:auto; }
+
+      .hero{ padding: clamp(64px, 9vw, 120px) 0 40px; text-align:center; position:relative; }
+      .hero::before{
+        content:"";
+        position:absolute;
+        inset:12% 5% auto;
+        height:65%;
+        background:radial-gradient(circle at center, rgba(167,224,255,.22), transparent 70%);
+        filter:blur(20px);
+        z-index:-1;
+      }
+      .title{ margin:0 0 12px; font-size: clamp(32px, 5.6vw, 72px); line-height:1.08; letter-spacing:.8px; color:#fff; text-shadow:0 10px 30px rgba(6,9,20,.75); }
+      .subtitle{ margin:0; font-size:clamp(16px, 2.6vw, 22px); color:rgba(244,250,255,.9); letter-spacing:.4px; max-width:720px; margin-inline:auto; }
 
       .section-head {
         display:flex;
-        align-items:end;
+        align-items:flex-end;
         justify-content:space-between;
         gap:16px;
-        margin:32px 0 14px;
-        color:#fff;
+        margin:32px 0 18px;
+        color:var(--ink);
       }
       .section-head h2 {
         margin:0;
-        font-size: clamp(20px, 2.8vw, 28px);
+        font-size: clamp(22px, 3vw, 32px);
         letter-spacing:.4px;
-        color:#fff;
+        color:var(--ink);
       }
       .section-head .hint {
         margin:0;
         font-size:14px;
-        color:#fff;
+        color:rgba(244,250,255,.82);
       }
 
-      .grid{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .adventure-board{ display:grid; gap:36px; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); align-items:start; }
+      .adventure-column{ display:grid; gap:22px; }
+      .adventure-column h3{ margin:0; font-size:20px; letter-spacing:.4px; color:var(--ink); }
+
+      .card-grid{ display:grid; gap:24px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+      @media (max-width: 1024px) {
+        .card-grid{ grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      }
       .card-link{ text-decoration:none; color:inherit; display:block; }
       .card{
         background:var(--panel);
         border:1px solid var(--edge);
-        border-radius:18px;
+        border-radius:20px;
         box-shadow:var(--shadow);
         overflow:hidden;
         backdrop-filter:var(--backdrop);
         transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-        color:#fff;
+        color:var(--ink);
         display:flex;
         flex-direction:column;
         cursor:pointer;
       }
       .card:hover{
-        transform:translateY(-2px);
-        border-color:rgba(255,255,255,.35);
-        box-shadow:0 12px 36px rgba(0,0,0,.45);
+        transform:translateY(-3px) scale(1.01);
+        border-color:rgba(167,224,255,.45);
+        box-shadow:0 18px 38px rgba(6,9,20,.55);
       }
 
-      .card img{ width:100%; height:160px; object-fit:cover; display:block; }
-      .card-body{ padding:18px 18px 20px; flex:1; display:flex; flex-direction:column; }
-      .card h3{ margin:0 0 6px; font-size:20px; letter-spacing:.3px; color:#fff; }
-      .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#fff; }
+      .card-media{ position:relative; height:200px; overflow:hidden; }
+      .card-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+      .card-media::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(to top, rgba(6,9,20,.55), transparent 65%);
+      }
+      .card-body{ padding:22px 22px 24px; flex:1; display:flex; flex-direction:column; gap:12px; }
+      .card h3{ margin:0; font-size:22px; letter-spacing:.4px; color:var(--ink); }
+      .schedule{ display:inline-flex; align-items:center; gap:8px; font-size:15px; color:rgba(244,250,255,.92); }
       .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
-      .next-session{ display:inline-block; margin-top:6px; padding:4px 10px; font-size:12px; background: rgba(255,255,255,.15); border-radius: 999px; }
-      .blurb{ margin:12px 0 0; color:#fff; opacity:.92; }
+      .next-session{ display:inline-block; margin-top:8px; padding:6px 12px; font-size:13px; background: rgba(184,228,255,.18); border-radius: 999px; color:rgba(12,18,32,.88); font-weight:600; }
+      .blurb{ margin:14px 0 0; color:rgba(244,250,255,.92); }
 
-      .oneshot-grid{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-      .oneshot-card .card-body{ gap:10px; }
-      .oneshot-card .schedule span:last-child{ color:rgba(255,255,255,.85); }
-      .cta-link{
-        margin-top:auto;
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        padding:10px 18px;
-        font-weight:600;
-        font-size:14px;
+      .oneshot-card{ position:relative; padding:28px 26px 26px; border-radius:22px; overflow:hidden; border:1px solid rgba(210,234,255,.35); background:linear-gradient(140deg, rgba(18,32,54,.92), rgba(34,54,84,.82)); box-shadow:0 22px 44px rgba(3,8,20,.48); }
+      .oneshot-card::before{
+        content:"";
+        position:absolute;
+        inset:-60% 25% auto;
+        height:150%;
+        background:radial-gradient(circle at center, rgba(167,224,255,.2), transparent 70%);
+        filter:blur(18px);
+        opacity:.8;
+      }
+      .oneshot-card::after{
+        content:"";
+        position:absolute;
+        inset:-40% auto auto -20%;
+        width:55%;
+        aspect-ratio:1/1;
+        background:radial-gradient(circle at center, rgba(255,140,210,.15), transparent 60%);
+        filter:blur(22px);
+        opacity:.8;
+      }
+      .oneshot-card > *{ position:relative; z-index:1; }
+      .oneshot-card h3{ margin:0; font-size:23px; letter-spacing:.5px; color:var(--ink); }
+      .oneshot-card .schedule{ font-size:15px; }
+      .oneshot-card .schedule span:last-child{ color:rgba(244,250,255,.9); }
+      .oneshot-card .blurb{ color:rgba(244,250,255,.9); margin-top:8px; line-height:1.5; }
+      .oneshot-card .cta-link{ margin-top:18px; }
+
+      .placeholder-strip{ display:inline-flex; align-items:center; gap:10px; padding:8px 14px; background:rgba(184,228,255,.16); border-radius:12px; font-size:13px; text-transform:uppercase; letter-spacing:.4px; color:rgba(244,250,255,.85); }
+
+      .dungeonmaster-trigger{
+        position:absolute;
+        right:12px;
+        bottom:8px;
+        padding:4px 10px;
+        font-size:12px;
         letter-spacing:.3px;
-        color:#fff;
-        background:rgba(167,224,255,.18);
+        color:rgba(231,243,255,.7);
+        background:transparent;
+        border:1px dashed rgba(231,243,255,.2);
         border-radius:999px;
-        text-decoration:none;
-        transition:background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+        cursor:pointer;
+        opacity:.35;
+        transition:opacity .2s ease, border-color .2s ease, color .2s ease;
       }
-      .cta-link:hover{
-        background:rgba(167,224,255,.32);
-        transform:translateY(-1px);
-        box-shadow:0 8px 20px rgba(0,0,0,.35);
+      .dungeonmaster-trigger:focus-visible,
+      .dungeonmaster-trigger:hover{
+        opacity:1;
+        border-color:rgba(167,224,255,.5);
+        color:#fff;
       }
+
+      .dungeonmaster-login{
+        position:fixed;
+        inset:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:24px;
+        background:rgba(2,4,11,.78);
+        backdrop-filter:blur(8px);
+        z-index:20;
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .25s ease;
+      }
+      .dungeonmaster-login[data-active="true"]{
+        opacity:1;
+        pointer-events:auto;
+      }
+      .dungeonmaster-login .card{
+        width:min(420px, 92vw);
+        background:linear-gradient(160deg, rgba(11,22,36,.96), rgba(36,46,72,.82));
+        border:1px solid rgba(167,224,255,.32);
+        box-shadow:0 30px 70px rgba(6,9,20,.6);
+        border-radius:26px;
+        padding:32px;
+        display:grid;
+        gap:18px;
+        cursor:auto;
+      }
+      .dungeonmaster-login h2{ margin:0; font-size:22px; letter-spacing:.4px; color:var(--ink); }
+      .dungeonmaster-login p{ margin:0; color:rgba(244,250,255,.85); }
+      .dungeonmaster-login form{ display:grid; gap:16px; }
+      .dungeonmaster-login label{ display:grid; gap:6px; text-align:left; font-size:14px; color:rgba(244,250,255,.9); }
+      .dungeonmaster-login input{ padding:12px 14px; border-radius:12px; border:1px solid rgba(210,234,255,.55); background:rgba(6,10,20,.7); color:var(--ink); font:inherit; }
+      .dungeonmaster-login button[type="submit"]{
+        padding:12px 18px;
+        border-radius:999px;
+        border:none;
+        font-weight:600;
+        background:linear-gradient(120deg, rgba(167,224,255,.9), rgba(120,140,255,.9));
+        color:#02040b;
+        cursor:pointer;
+        box-shadow:0 18px 36px rgba(167,224,255,.28);
+      }
+      .dungeonmaster-login .dismiss{
+        justify-self:end;
+        background:none;
+        border:none;
+        color:rgba(231,243,255,.65);
+        font-size:14px;
+        cursor:pointer;
+        padding:4px 6px;
+      }
+      .dungeonmaster-login .dismiss:hover,
+      .dungeonmaster-login .dismiss:focus-visible{ color:#fff; }
+      .dungeonmaster-login .error{ color:#ffbbc3; font-size:13px; min-height:18px; }
 
       .spacer{ height:28px; }
+      @media (max-width:720px){
+        .hero{ padding-block:72px 36px; }
+        .section-head{ flex-direction:column; align-items:flex-start; }
+        .adventure-board{ grid-template-columns:1fr; gap:28px; }
+      }
       @media (max-width:380px){ .card-body{ padding:16px; } }
     </style>
   </head>
@@ -197,66 +334,165 @@ const oneShots = ONE_SHOTS;
       <main>
         <header class="hero container">
           <h1 class="title">{randomGreeting}</h1>
+          <p class="subtitle">
+            Spin tales of daring, gather your party, and bring each adventure to life with Wasem as your guide.
+          </p>
+          <button
+            type="button"
+            class="dungeonmaster-trigger"
+            data-login-toggle
+            aria-haspopup="dialog"
+            aria-controls="dungeonmaster-login"
+          >
+            Dungeonmaster Access
+          </button>
         </header>
 
-        <section class="container" aria-labelledby="active-campaigns">
+        <section class="container" aria-labelledby="current-adventures">
           <div class="section-head">
-            <h2 id="active-campaigns">Active Campaigns</h2>
-            <p class="hint">Schedules and quick summaries</p>
+            <h2 id="current-adventures">Current Adventures</h2>
+            <p class="hint">Stay on top of the ongoing stories and quick one-shots</p>
           </div>
 
-          <div class="grid">
-            {campaigns.map(c => (
-              <a class="card-link" href={`/campaigns/${c.id}`} aria-label={`Open ${c.title}`}>
-                <article class="card" id={c.id}>
-                  <img src={c.image} alt={`${c.title} thumbnail`} />
-                  <div class="card-body">
-                    <h3>{c.title}</h3>
-                    <div class="schedule" aria-label="schedule">
-                      <span class="dot" aria-hidden="true"></span>
-                      <span>{c.schedule}</span>
-                    </div>
-                    <div class="next-session">Next Session: {c.nextSession}</div>
-                    <p class="blurb">{c.blurb}</p>
-                  </div>
-                </article>
-              </a>
-            ))}
-          </div>
-
-          <div class="spacer"></div>
-        </section>
-
-        <section class="container" aria-labelledby="one-shot-adventures">
-          <div class="section-head">
-            <h2 id="one-shot-adventures">One-Shot Adventures</h2>
-          </div>
-
-          <div class="grid oneshot-grid">
-            {oneShots.map(shot => (
-              <article class="card oneshot-card" id={shot.id}>
-                <img src={shot.image} alt={`${shot.title} illustration`} />
-                <div class="card-body">
-                  <h3>{shot.title}</h3>
-                  <div class="schedule" aria-label="recommended party level and system">
-                    <span class="dot" aria-hidden="true"></span>
-                    <span>{shot.level} • {shot.system}</span>
-                  </div>
-                  <p class="blurb">{shot.blurb}</p>
-                  <a class="cta-link" href={shot.vttUrl} target="_blank" rel="noopener">
-                    Launch the VTT
-                    <span aria-hidden="true">↗</span>
+          <div class="adventure-board">
+            <div class="adventure-column" aria-labelledby="active-campaigns">
+              <h3 id="active-campaigns">Active Campaigns</h3>
+              <div class="card-grid">
+                {campaigns.map(c => (
+                  <a class="card-link" href={`/campaigns/${c.id}`} aria-label={`Open ${c.title}`}>
+                    <article class="card" id={c.id}>
+                      <div class="card-media">
+                        <img src={c.image} alt={`${c.title} thumbnail`} />
+                      </div>
+                      <div class="card-body">
+                        <h3>{c.title}</h3>
+                        <div class="schedule" aria-label="schedule">
+                          <span class="dot" aria-hidden="true"></span>
+                          <span>{c.schedule}</span>
+                        </div>
+                        <div class="next-session">Next Session: {c.nextSession}</div>
+                        <p class="blurb">{c.blurb}</p>
+                      </div>
+                    </article>
                   </a>
-                </div>
-              </article>
-            ))}
-          </div>
+                ))}
+              </div>
+            </div>
 
-          <div class="spacer"></div>
+            <div class="adventure-column" aria-labelledby="one-shot-adventures">
+              <h3 id="one-shot-adventures">One-Shot Adventures</h3>
+              <div class="card-grid card-grid--oneshots">
+                {oneShots.map(shot => (
+                  <article class="card oneshot-card" id={shot.id}>
+                    <div class="placeholder-strip" aria-hidden="true">
+                      <span>One-shot template</span>
+                    </div>
+                    <h3>{shot.title}</h3>
+                    <div class="schedule" aria-label="recommended party level and system">
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>{shot.level} • {shot.system}</span>
+                    </div>
+                    <p class="blurb">{shot.blurb}</p>
+                    <a class="cta-link" href={shot.vttUrl} target="_blank" rel="noopener">
+                      Launch the VTT
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 
+      <div class="dungeonmaster-login" id="dungeonmaster-login" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="card">
+          <button type="button" class="dismiss" data-login-dismiss aria-label="Close login">Close ✕</button>
+          <h2>Dungeonmaster Console Access</h2>
+          <p>Enter your private credentials to reach the dashboard and manage live campaigns.</p>
+          <form id="dungeonmaster-login-form">
+            <label>
+              Access email
+              <input type="email" name="email" autocomplete="off" required />
+            </label>
+            <label>
+              Access password
+              <input type="password" name="password" autocomplete="off" required />
+            </label>
+            <div class="error" data-error-message role="alert" aria-live="polite"></div>
+            <button type="submit">Enter Dungeonmaster Dashboard</button>
+          </form>
+        </div>
+      </div>
+
       <Footer />
     </div>
+    <script is:inline>
+      const loginModal = document.querySelector('.dungeonmaster-login');
+      const toggleButton = document.querySelector('[data-login-toggle]');
+      const dismissButton = document.querySelector('[data-login-dismiss]');
+      const form = document.getElementById('dungeonmaster-login-form');
+      const errorBox = loginModal?.querySelector('[data-error-message]');
+      const requiredEmail = 'Jordanwasem93@gmail.com';
+      const requiredPassword = 'Xqxq77##';
+
+      const openModal = () => {
+        if (!loginModal) return;
+        loginModal.setAttribute('data-active', 'true');
+        loginModal.setAttribute('aria-hidden', 'false');
+        if (errorBox) {
+          errorBox.textContent = '';
+        }
+        form?.reset();
+        loginModal.querySelector('input')?.focus();
+      };
+
+      const closeModal = () => {
+        if (!loginModal) return;
+        loginModal.setAttribute('data-active', 'false');
+        loginModal.setAttribute('aria-hidden', 'true');
+        toggleButton?.focus();
+      };
+
+      toggleButton?.addEventListener('click', openModal);
+      dismissButton?.addEventListener('click', closeModal);
+      loginModal?.addEventListener('click', (event) => {
+        if (event.target === loginModal) {
+          closeModal();
+        }
+      });
+
+      form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!form) return;
+        const formData = new FormData(form);
+        const email = String(formData.get('email') ?? '').trim();
+        const password = String(formData.get('password') ?? '');
+
+        if (
+          email.toLowerCase() === requiredEmail.toLowerCase() &&
+          password === requiredPassword
+        ) {
+          sessionStorage.setItem('dungeonmasterAuth', '1');
+          window.location.href = '/dashboard';
+        } else {
+          if (errorBox) {
+            errorBox.textContent = 'Access denied. Double-check the dungeonmaster credentials.';
+          }
+        }
+      });
+
+      form?.addEventListener('input', () => {
+        if (errorBox) {
+          errorBox.textContent = '';
+        }
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && loginModal?.getAttribute('data-active') === 'true') {
+          closeModal();
+        }
+      });
+    </script>
   </body>
 </html>
