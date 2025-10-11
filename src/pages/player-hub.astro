@@ -1,0 +1,1124 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { campaigns as CAMPAIGNS } from '../campaigns';
+
+const campaignMap = new Map(CAMPAIGNS.map((campaign) => [campaign.id, campaign]));
+
+const defaultPlayerState = {
+  player: {
+    name: 'Gideon Thorne',
+    pronouns: 'he/him',
+    character: {
+      name: 'Ser Rowan Brightshield',
+      pronouns: 'he/they',
+      portrait: '/acroterra.png',
+      sheet: 'https://ddb.ac/characters/rowan',
+      conditions: ['Inspired', 'Blessed'],
+      inventory: ['Shard of Verdant Dawn', 'Skyport Signet', 'Sending stone'],
+    },
+    session: {
+      title: 'Chapter 12: The Shattered Beacon',
+      time: 'Monday • 7:00 PM CST',
+      location: 'Foundry VTT',
+      link: 'https://foundryvtt.questwithwasem.com/acroterra',
+      agenda: ['Recap whispers', 'Dive into the Beacon catacombs', 'Debrief and XP tally'],
+    },
+  },
+  journal: {
+    drafts: [
+      {
+        id: 'draft-1',
+        title: 'Private note – The Starweaver\'s symbol',
+        updated: 'Saved 2 hours ago',
+      },
+    ],
+    pending: [
+      {
+        id: 'pending-1',
+        title: 'Beacon log: Fractured light',
+        status: 'Awaiting Archivist approval',
+      },
+    ],
+    published: [
+      {
+        id: 'pub-1',
+        title: 'Acroterra – Arrival at Skyport Aurum',
+        timestamp: 'Published last week',
+      },
+    ],
+  },
+  reveals: {
+    handouts: ['Beacon schematic', 'Letter from Doc Saffron'],
+    npcs: ['Doc Saffron', 'Captain Aiyra'],
+    items: ['Shard of Verdant Dawn'],
+  },
+  campaigns: [
+    {
+      id: 'acroterra',
+      title: 'Acroterra',
+      mood: 'You are in Acroterra. Airships drift through aurora skies as divine machinations stir beneath the clouds.',
+      art: campaignMap.get('acroterra')?.image || '/acroterra.png',
+      chronicle: [
+        {
+          id: 'acroterra-session-11',
+          title: 'Session 11 – The Beacon Breaches',
+          summary: 'We unlocked the Beacon gate and glimpsed the void beyond.',
+          date: 'Sep 23',
+        },
+        {
+          id: 'acroterra-session-10',
+          title: 'Session 10 – Echoes of the Choir',
+          summary: 'Recovered the melody that calms the crystal storms.',
+          date: 'Sep 09',
+        },
+      ],
+      codex: {
+        npcs: [
+          { name: 'Doc Saffron', blurb: 'Artificer keeper of the Skyport.' },
+          { name: 'The Night Choir', blurb: 'Harmonic cult guarding the Beacon.' },
+        ],
+        locations: [
+          { name: 'Skyport Aurum', blurb: 'Floating docks anchored to the Beacon.' },
+          { name: 'Beacon Catacombs', blurb: 'Maze of prismatic tunnels under the tower.' },
+        ],
+        items: [
+          { name: 'Shard of Verdant Dawn', blurb: 'Attuned to Rowan. Pulses near rift energy.' },
+        ],
+      },
+      mapPins: [
+        { name: 'Skyport Aurum', status: 'Explored', description: 'Hub for airship travel and commerce.' },
+        { name: 'Beacon Catacombs', status: 'In progress', description: 'Unlock new routes during next delve.' },
+      ],
+      tools: {
+        foundry: 'https://foundryvtt.questwithwasem.com/acroterra',
+        discord: 'https://discord.gg/questwithwasem',
+        dice: 'https://rollwithme.xyz/',
+        safety: 'https://questwithwasem.com/safety-tools',
+      },
+      requests: [
+        {
+          id: 'req-1',
+          type: 'Downtime',
+          title: 'Craft stormglass',
+          status: 'Approved',
+        },
+      ],
+    },
+    {
+      id: 'drakkenheim',
+      title: 'Dungeons of Drakkenheim',
+      mood: 'You walk the ash-shrouded streets of Drakkenheim where eldritch sparks haunt every shadow.',
+      art: campaignMap.get('drakkenheim')?.image || '/drakkenheim.png',
+      chronicle: [
+        {
+          id: 'drak-session-7',
+          title: 'Episode 7 – Bargain with the Lanterns',
+          summary: 'Forged an uneasy pact inside the ruined cathedral.',
+          date: 'Sep 18',
+        },
+      ],
+      codex: {
+        npcs: [
+          { name: 'Commander Petra', blurb: 'Leader of the Hooded Lanterns.' },
+          { name: 'The Starweaver', blurb: 'Whispers secrets in your dreams.' },
+        ],
+        locations: [
+          { name: 'Clocktower Plaza', blurb: 'Time-touched ruins at city center.' },
+        ],
+        items: [
+          { name: 'Obsidian Codex', blurb: 'Sealed until the meteor heart is found.' },
+        ],
+      },
+      mapPins: [
+        { name: 'Clocktower Plaza', status: 'Explored', description: 'Site of the meteor impact.' },
+        { name: 'Cathedral of Falling Stars', status: 'Locked', description: 'Requires Starweaver\'s sigil.' },
+      ],
+      tools: {
+        foundry: 'https://foundryvtt.questwithwasem.com/drakkenheim',
+        discord: 'https://discord.gg/questwithwasem',
+        dice: 'https://rollwithme.xyz/',
+        safety: 'https://questwithwasem.com/safety-tools',
+      },
+      requests: [],
+    },
+  ],
+};
+
+const heroCampaign = defaultPlayerState.campaigns[0];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={`Player Hub • ${SITE_TITLE}`}
+      description="Immersive portal for players to review reveals, journals, and upcoming sessions."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f4fbff;
+        --muted: rgba(216, 234, 255, 0.86);
+        --accent: #87d4ff;
+        --accent-strong: #c594ff;
+        --panel: rgba(6, 14, 24, 0.82);
+        --panel-soft: rgba(10, 18, 34, 0.65);
+        --edge: rgba(135, 212, 255, 0.3);
+        --shadow: 0 24px 60px rgba(2, 6, 16, 0.6);
+        --glow: 0 0 25px rgba(135, 212, 255, 0.45);
+      }
+
+      body {
+        margin: 0;
+        font: 16px/1.6 "Manrope", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at 20% 0%, rgba(135, 212, 255, 0.22), transparent 55%),
+          radial-gradient(circle at 80% 10%, rgba(197, 148, 255, 0.18), transparent 60%),
+          #050713;
+        min-height: 100vh;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -140px;
+        background: url('/Mountains.png') center/cover no-repeat;
+        filter: blur(18px) brightness(0.35);
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at 40% 120%, rgba(135, 212, 255, 0.18), transparent 60%),
+          linear-gradient(160deg, rgba(135, 212, 255, 0.08), rgba(197, 148, 255, 0.04));
+        mix-blend-mode: screen;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      main {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0 clamp(16px, 4vw, 48px) clamp(72px, 10vw, 120px);
+      }
+
+      .wrap {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+      }
+
+      .player-wrap {
+        width: min(1200px, 100%);
+        margin: clamp(32px, 5vw, 64px) auto 0;
+        display: grid;
+        gap: clamp(24px, 4vw, 36px);
+      }
+
+      .player-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 36px;
+        border: 1px solid var(--edge);
+        background: linear-gradient(160deg, rgba(135, 212, 255, 0.22), rgba(20, 30, 58, 0.88));
+        box-shadow: var(--shadow);
+        display: grid;
+      }
+
+      .hero-art {
+        position: relative;
+        min-height: clamp(220px, 40vw, 320px);
+        background: url('${heroCampaign?.art || '/acroterra.png'}') center/cover no-repeat;
+        filter: saturate(120%);
+      }
+
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(5, 8, 16, 0.85), rgba(5, 10, 24, 0.4));
+      }
+
+      .hero-content {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        align-content: end;
+        padding: clamp(24px, 5vw, 42px);
+        gap: 12px;
+      }
+
+      .hero-title {
+        margin: 0;
+        font-size: clamp(26px, 5vw, 40px);
+        letter-spacing: 0.8px;
+        text-shadow: var(--glow);
+      }
+
+      .hero-subtitle {
+        margin: 0;
+        font-size: clamp(15px, 2.6vw, 18px);
+        color: var(--muted);
+        max-width: 620px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .hero-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.4);
+        background: rgba(6, 12, 22, 0.75);
+        color: inherit;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .hero-actions a:hover,
+      .hero-actions a:focus-visible {
+        background: rgba(135, 212, 255, 0.2);
+        border-color: rgba(135, 212, 255, 0.55);
+        transform: translateY(-1px);
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: clamp(18px, 3vw, 26px);
+      }
+
+      .card {
+        border-radius: 26px;
+        border: 1px solid var(--edge);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: clamp(18px, 2.6vw, 24px);
+        display: grid;
+        gap: 12px;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: clamp(18px, 2.4vw, 22px);
+      }
+
+      .card p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .character-card {
+        grid-template-columns: minmax(120px, 140px) 1fr;
+        gap: 18px;
+      }
+
+      .character-portrait {
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid rgba(135, 212, 255, 0.35);
+        background: rgba(12, 20, 36, 0.8);
+        aspect-ratio: 3 / 4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .character-portrait img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(135, 212, 255, 0.35);
+        background: rgba(10, 18, 32, 0.7);
+        font-size: 12px;
+        letter-spacing: 0.4px;
+      }
+
+      .agenda-list,
+      .simple-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .panel {
+        border-radius: 28px;
+        border: 1px solid var(--edge);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: clamp(20px, 3vw, 30px);
+        display: grid;
+        gap: clamp(16px, 3vw, 22px);
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: clamp(20px, 2.8vw, 28px);
+      }
+
+      .panel h3 {
+        margin: 0;
+        font-size: clamp(18px, 2.4vw, 22px);
+      }
+
+      .journal-columns {
+        display: grid;
+        gap: 16px;
+      }
+
+      @media (min-width: 840px) {
+        .journal-columns {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .journal-group {
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.28);
+        background: rgba(10, 18, 34, 0.72);
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .journal-group h4 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .journal-entry {
+        border-radius: 16px;
+        border: 1px solid rgba(135, 212, 255, 0.2);
+        padding: 12px 14px;
+        background: rgba(6, 12, 24, 0.7);
+      }
+
+      .journal-entry strong {
+        display: block;
+      }
+
+      .reveal-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .reveal-list li {
+        list-style: none;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.24);
+        padding: 10px 14px;
+        background: rgba(6, 12, 22, 0.65);
+      }
+
+      .tabs {
+        display: grid;
+        gap: 18px;
+      }
+
+      .tablist {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .tablist button {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(135, 212, 255, 0.28);
+        background: rgba(6, 12, 24, 0.7);
+        color: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .tablist button[aria-selected='true'] {
+        background: rgba(135, 212, 255, 0.22);
+        border-color: rgba(135, 212, 255, 0.5);
+      }
+
+      .tablist button:hover,
+      .tablist button:focus-visible {
+        background: rgba(135, 212, 255, 0.18);
+        border-color: rgba(135, 212, 255, 0.4);
+      }
+
+      .tabpanel {
+        display: none;
+        border-radius: 28px;
+        border: 1px solid var(--edge);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        padding: clamp(20px, 3vw, 28px);
+        gap: clamp(16px, 2.6vw, 24px);
+      }
+
+      .tabpanel.active {
+        display: grid;
+      }
+
+      .chronicle {
+        display: grid;
+        gap: 14px;
+      }
+
+      .chronicle-item {
+        border-left: 3px solid rgba(135, 212, 255, 0.45);
+        padding-left: 14px;
+      }
+
+      .chronicle-item strong {
+        display: block;
+      }
+
+      .codex-columns {
+        display: grid;
+        gap: 16px;
+      }
+
+      @media (min-width: 720px) {
+        .codex-columns {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      .codex-group {
+        border-radius: 20px;
+        border: 1px solid rgba(135, 212, 255, 0.24);
+        background: rgba(10, 18, 32, 0.7);
+        padding: 18px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .codex-group h4 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .codex-entry {
+        border-radius: 12px;
+        padding: 10px 12px;
+        border: 1px solid rgba(135, 212, 255, 0.18);
+        background: rgba(6, 12, 22, 0.6);
+      }
+
+      .map-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .map-card {
+        border-radius: 16px;
+        border: 1px solid rgba(135, 212, 255, 0.22);
+        padding: 14px;
+        background: rgba(6, 12, 22, 0.65);
+      }
+
+      .tool-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .tool-grid a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.3);
+        background: rgba(6, 12, 24, 0.7);
+        color: inherit;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .tool-grid a:hover,
+      .tool-grid a:focus-visible {
+        background: rgba(135, 212, 255, 0.2);
+        border-color: rgba(135, 212, 255, 0.45);
+      }
+
+      .tool-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(135, 212, 255, 0.32);
+        background: rgba(6, 12, 24, 0.72);
+        color: inherit;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+
+      .tool-link:hover,
+      .tool-link:focus-visible {
+        background: rgba(135, 212, 255, 0.2);
+        border-color: rgba(135, 212, 255, 0.45);
+      }
+
+      .requests-grid {
+        display: grid;
+        gap: clamp(18px, 3vw, 24px);
+      }
+
+      @media (min-width: 840px) {
+        .requests-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(135, 212, 255, 0.32);
+        background: rgba(6, 12, 24, 0.75);
+        color: inherit;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      form button[type='submit'] {
+        justify-self: start;
+        padding: 12px 22px;
+        border-radius: 14px;
+        border: 1px solid rgba(135, 212, 255, 0.4);
+        background: linear-gradient(135deg, rgba(135, 212, 255, 0.85), rgba(197, 148, 255, 0.85));
+        color: #02040c;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 18px 40px rgba(135, 212, 255, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      form button[type='submit']:hover,
+      form button[type='submit']:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 48px rgba(135, 212, 255, 0.45);
+      }
+
+      .status-line {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .empty-state {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
+        .character-card {
+          grid-template-columns: 1fr;
+        }
+
+        .character-portrait {
+          max-width: 200px;
+          justify-self: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <Header />
+      <main>
+        <div class="player-wrap" data-player>
+          <section class="player-hero">
+            <div class="hero-art"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+              <h1 class="hero-title">Realm portals await</h1>
+              <p class="hero-subtitle">{heroCampaign?.mood}</p>
+              <div class="hero-actions">
+                <a href="https://foundryvtt.questwithwasem.com" rel="noreferrer">Enter Foundry</a>
+                <a href="https://discord.gg/questwithwasem" rel="noreferrer">Join the Discord table</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="home">
+            <h2>Home</h2>
+            <p>Return to your character, session briefings, and the secrets revealed only to you.</p>
+            <div class="card-grid">
+              <article class="card character-card" data-character>
+                <div class="character-portrait">
+                  <img src={defaultPlayerState.player.character.portrait} alt="Portrait of your character" loading="lazy" />
+                </div>
+                <div>
+                  <h3>{defaultPlayerState.player.character.name}</h3>
+                  <p>{defaultPlayerState.player.character.pronouns}</p>
+                  <div class="badge-row">
+                    {defaultPlayerState.player.character.conditions.map((condition) => (
+                      <span class="badge">{condition}</span>
+                    ))}
+                  </div>
+                  <p>
+                    Inventory highlights:
+                    <strong>{defaultPlayerState.player.character.inventory.join(', ')}</strong>
+                  </p>
+                  <a class="tool-link" href={defaultPlayerState.player.character.sheet} rel="noreferrer">Open character sheet →</a>
+                </div>
+              </article>
+
+              <article class="card" data-session>
+                <h3>Today’s Session</h3>
+                <p><strong>{defaultPlayerState.player.session.title}</strong></p>
+                <p>{defaultPlayerState.player.session.time}</p>
+                <p>Location: {defaultPlayerState.player.session.location}</p>
+                <ul class="agenda-list">
+                  {defaultPlayerState.player.session.agenda.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+                <a class="tool-link" href={defaultPlayerState.player.session.link} rel="noreferrer">Launch table →</a>
+              </article>
+
+              <article class="card" data-reveals>
+                <h3>Revealed to you</h3>
+                <p>Handouts and dossiers the Archivist has already shared.</p>
+                <ul class="reveal-list">
+                  {defaultPlayerState.reveals.handouts.map((item) => (
+                    <li>Handout: {item}</li>
+                  ))}
+                  {defaultPlayerState.reveals.npcs.map((npc) => (
+                    <li>NPC dossier: {npc}</li>
+                  ))}
+                  {defaultPlayerState.reveals.items.map((artifact) => (
+                    <li>Artifact: {artifact}</li>
+                  ))}
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel" id="journal">
+            <h2>Your Journal</h2>
+            <p>Draft tales, submit them for review, and revisit the entries the Archivist canonized.</p>
+            <div class="journal-columns">
+              <div class="journal-group" data-journal-drafts>
+                <h4>Drafts</h4>
+              </div>
+              <div class="journal-group" data-journal-pending>
+                <h4>Submitted</h4>
+              </div>
+              <div class="journal-group" data-journal-published>
+                <h4>Published</h4>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel" id="campaigns">
+            <h2>Campaign Realms</h2>
+            <p>Step through any portal to browse chronicles, codex entries, maps, and table tools.</p>
+            <div class="tabs" data-tabs>
+              <div class="tablist" role="tablist" aria-label="Campaigns">
+                {defaultPlayerState.campaigns.map((campaign, index) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={index === 0 ? 'true' : 'false'}
+                    aria-controls={`panel-${campaign.id}`}
+                    id={`tab-${campaign.id}`}
+                    data-tab={campaign.id}
+                  >
+                    {campaign.title}
+                  </button>
+                ))}
+              </div>
+              {defaultPlayerState.campaigns.map((campaign, index) => (
+                <div
+                  class:list={{ tabpanel: true, active: index === 0 }}
+                  role="tabpanel"
+                  id={`panel-${campaign.id}`}
+                  aria-labelledby={`tab-${campaign.id}`}
+                  data-panel={campaign.id}
+                  tabindex="0"
+                >
+                  <div class="chronicle" data-chronicle={campaign.id}>
+                    <h3>Chronicle timeline</h3>
+                    {campaign.chronicle.map((entry) => (
+                      <article class="chronicle-item">
+                        <strong>{entry.title}</strong>
+                        <span class="status-line">{entry.date}</span>
+                        <p>{entry.summary}</p>
+                      </article>
+                    ))}
+                  </div>
+                  <div class="codex-columns">
+                    <section class="codex-group">
+                      <h4>Codex – NPCs</h4>
+                      {campaign.codex.npcs.map((npc) => (
+                        <div class="codex-entry">
+                          <strong>{npc.name}</strong>
+                          <p>{npc.blurb}</p>
+                        </div>
+                      ))}
+                    </section>
+                    <section class="codex-group">
+                      <h4>Codex – Locations</h4>
+                      {campaign.codex.locations.map((location) => (
+                        <div class="codex-entry">
+                          <strong>{location.name}</strong>
+                          <p>{location.blurb}</p>
+                        </div>
+                      ))}
+                    </section>
+                    <section class="codex-group">
+                      <h4>Codex – Items</h4>
+                      {campaign.codex.items.map((item) => (
+                        <div class="codex-entry">
+                          <strong>{item.name}</strong>
+                          <p>{item.blurb}</p>
+                        </div>
+                      ))}
+                    </section>
+                  </div>
+                  <div>
+                    <h3>Map discoveries</h3>
+                    <div class="map-grid">
+                      {campaign.mapPins.map((pin) => (
+                        <article class="map-card">
+                          <strong>{pin.name}</strong>
+                          <div class="status-line">{pin.status}</div>
+                          <p>{pin.description}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3>Table tools</h3>
+                    <div class="tool-grid">
+                      <a href={campaign.tools.foundry} rel="noreferrer">Foundry world <span>↗</span></a>
+                      <a href={campaign.tools.discord} rel="noreferrer">Discord channel <span>↗</span></a>
+                      <a href={campaign.tools.dice} rel="noreferrer">Dice roller <span>↗</span></a>
+                      <a href={campaign.tools.safety} rel="noreferrer">Safety tools card <span>↗</span></a>
+                    </div>
+                  </div>
+                  <div>
+                    <h3>Requests &amp; approvals</h3>
+                    <div class="map-grid" data-requests={campaign.id}>
+                      {campaign.requests.length === 0 ? (
+                        <p class="empty-state">No outstanding requests. Send a downtime action below.</p>
+                      ) : (
+                        campaign.requests.map((request) => (
+                          <article class="map-card">
+                            <strong>{request.type}</strong>
+                            <div class="status-line">{request.status}</div>
+                            <p>{request.title}</p>
+                          </article>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section class="panel" id="requests">
+            <h2>Send a request</h2>
+            <p>Share your story with the Archivist, request downtime, or update your character dossier.</p>
+            <div class="requests-grid">
+              <form data-journal-form>
+                <h3>New Journal Entry</h3>
+                <label>
+                  Title
+                  <input type="text" name="title" placeholder="Chronicle title" required />
+                </label>
+                <label>
+                  Entry
+                  <textarea name="content" placeholder="Tell your tale..."></textarea>
+                </label>
+                <label>
+                  Visibility
+                  <select name="audience">
+                    <option value="Private">Private</option>
+                    <option value="GM">GM only</option>
+                    <option value="Party">Party</option>
+                  </select>
+                </label>
+                <button type="submit">Submit to Archivist</button>
+                <p class="status-line" data-journal-status></p>
+              </form>
+
+              <form data-downtime-form>
+                <h3>Downtime Action</h3>
+                <label>
+                  Campaign
+                  <select name="campaign">
+                    {defaultPlayerState.campaigns.map((campaign) => (
+                      <option value={campaign.id}>{campaign.title}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Activity
+                  <textarea name="activity" placeholder="Training, crafting, contacting allies..." required></textarea>
+                </label>
+                <label>
+                  Goal
+                  <input type="text" name="goal" placeholder="What do you hope to achieve?" />
+                </label>
+                <button type="submit">Send downtime plan</button>
+                <p class="status-line" data-downtime-status></p>
+              </form>
+
+              <form data-update-form>
+                <h3>Character Update</h3>
+                <label>
+                  What’s changing?
+                  <input type="text" name="change" placeholder="New portrait, pronouns, secret..." required />
+                </label>
+                <label>
+                  Details for the GM
+                  <textarea name="details" placeholder="Share context or lore."></textarea>
+                </label>
+                <button type="submit">Request update</button>
+                <p class="status-line" data-update-status></p>
+              </form>
+            </div>
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </div>
+
+    <script type="application/json" id="player-defaults">{JSON.stringify(defaultPlayerState)}</script>
+    <script is:inline>
+      const defaultsEl = document.getElementById('player-defaults');
+      const parseDefaults = () => {
+        if (!defaultsEl) return {};
+        try {
+          return JSON.parse(defaultsEl.textContent || '{}');
+        } catch (error) {
+          console.warn('Failed to parse player defaults', error);
+          return {};
+        }
+      };
+
+      const STORAGE_KEY = 'playerHubState';
+
+      const loadState = () => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          const defaults = parseDefaults();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+          return defaults;
+        }
+        try {
+          return JSON.parse(stored);
+        } catch (error) {
+          console.warn('Failed to parse player hub state', error);
+          const defaults = parseDefaults();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+          return defaults;
+        }
+      };
+
+      let state = loadState();
+
+      const persist = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      };
+
+      const renderJournal = () => {
+        const draftsContainer = document.querySelector('[data-journal-drafts]');
+        const pendingContainer = document.querySelector('[data-journal-pending]');
+        const publishedContainer = document.querySelector('[data-journal-published]');
+
+        const renderGroup = (container, list, emptyMessage) => {
+          if (!container) return;
+          container.querySelectorAll('.journal-entry, .empty-state').forEach((node) => node.remove());
+          if (!list?.length) {
+            const empty = document.createElement('p');
+            empty.className = 'empty-state';
+            empty.textContent = emptyMessage;
+            container.appendChild(empty);
+            return;
+          }
+          list.forEach((entry) => {
+            const item = document.createElement('article');
+            item.className = 'journal-entry';
+            item.innerHTML = `
+              <strong>${entry.title}</strong>
+              <span class="status-line">${entry.updated || entry.status || entry.timestamp || ''}</span>
+            `;
+            container.appendChild(item);
+          });
+        };
+
+        renderGroup(draftsContainer, state.journal?.drafts, 'No drafts yet. Start a private note.');
+        renderGroup(pendingContainer, state.journal?.pending, 'Nothing submitted. Share your tale!');
+        renderGroup(publishedContainer, state.journal?.published, 'No published entries yet.');
+      };
+
+      const tabRoot = document.querySelector('[data-tabs]');
+      const handleTabs = () => {
+        if (!tabRoot) return;
+        const buttons = Array.from(tabRoot.querySelectorAll('[role="tab"]'));
+        const panels = Array.from(tabRoot.querySelectorAll('[role="tabpanel"]'));
+
+        const setActive = (id) => {
+          buttons.forEach((button) => {
+            const isActive = button.dataset.tab === id;
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+          panels.forEach((panel) => {
+            if (panel.dataset.panel === id) {
+              panel.classList.add('active');
+            } else {
+              panel.classList.remove('active');
+            }
+          });
+        };
+
+        buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const id = button.dataset.tab;
+            if (id) setActive(id);
+          });
+          button.addEventListener('keydown', (event) => {
+            if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+            event.preventDefault();
+            const index = buttons.indexOf(button);
+            const delta = event.key === 'ArrowRight' ? 1 : -1;
+            const next = (index + delta + buttons.length) % buttons.length;
+            buttons[next].focus();
+            const id = buttons[next].dataset.tab;
+            if (id) setActive(id);
+          });
+        });
+      };
+
+      const handleForm = (selector, targetList, statusSelector, successMessage) => {
+        const form = document.querySelector(selector);
+        const statusEl = document.querySelector(statusSelector);
+        form?.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const entry = Object.fromEntries(formData.entries());
+          entry.id = `${targetList}-${Date.now()}`;
+          state[targetList] = state[targetList] || {};
+          if (targetList === 'journal') {
+            state.journal = state.journal || {};
+            state.journal.pending = [
+              { id: entry.id, title: entry.title || 'Untitled entry', status: 'Sent to Archivist just now' },
+              ...(state.journal.pending || []),
+            ];
+          } else if (targetList === 'downtime') {
+            state.campaigns = (state.campaigns || []).map((campaign) => {
+              if (campaign.id !== entry.campaign) return campaign;
+              const requests = campaign.requests || [];
+              return {
+                ...campaign,
+                requests: [
+                  { id: entry.id, type: 'Downtime', title: entry.activity || 'Downtime request', status: 'Awaiting review' },
+                  ...requests,
+                ],
+              };
+            });
+          } else if (targetList === 'updates') {
+            state.journal = state.journal || {};
+            state.journal.pending = [
+              { id: entry.id, title: entry.change || 'Character update', status: 'Update sent to GM' },
+              ...(state.journal.pending || []),
+            ];
+          }
+          persist();
+          form.reset();
+          if (statusEl) {
+            statusEl.textContent = successMessage;
+            setTimeout(() => {
+              statusEl.textContent = '';
+            }, 4000);
+          }
+          renderJournal();
+          if (targetList === 'downtime') {
+            const requestsContainers = document.querySelectorAll('[data-requests]');
+            requestsContainers.forEach((container) => {
+              const campaignId = container.dataset.requests;
+              const campaign = (state.campaigns || []).find((item) => item.id === campaignId);
+              if (!campaign) return;
+              container.innerHTML = '';
+              if (!campaign.requests?.length) {
+                const empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No outstanding requests. Send a downtime action below.';
+                container.appendChild(empty);
+                return;
+              }
+              campaign.requests.forEach((request) => {
+                const card = document.createElement('article');
+                card.className = 'map-card';
+                card.innerHTML = `
+                  <strong>${request.type}</strong>
+                  <div class="status-line">${request.status}</div>
+                  <p>${request.title}</p>
+                `;
+                container.appendChild(card);
+              });
+            });
+          }
+        });
+      };
+
+      renderJournal();
+      handleTabs();
+      handleForm('[data-journal-form]', 'journal', '[data-journal-status]', 'Entry submitted to the Archivist!');
+      handleForm('[data-downtime-form]', 'downtime', '[data-downtime-status]', 'Downtime request sent.');
+      handleForm('[data-update-form]', 'updates', '[data-update-status]', 'Update shared with the GM.');
+    </script>
+  </body>
+</html>
