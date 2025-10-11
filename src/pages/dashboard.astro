@@ -1,0 +1,402 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { campaigns as CAMPAIGNS } from '../campaigns';
+
+function formatSessionDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function getNextSessionFromWeekday(weekday?: number, biweekly = false) {
+  if (typeof weekday !== 'number' || Number.isNaN(weekday)) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const currentDay = today.getDay();
+  const interval = biweekly ? 14 : 7;
+  let daysUntil = (weekday - currentDay + 7) % 7;
+  if (daysUntil === 0) daysUntil = interval;
+
+  const next = new Date(today);
+  next.setDate(today.getDate() + daysUntil);
+
+  while (next <= today) {
+    next.setDate(next.getDate() + interval);
+  }
+
+  return formatSessionDate(next);
+}
+
+function getNextFromBaseline(startDateIso?: string, intervalDays?: number) {
+  if (!startDateIso || !intervalDays || intervalDays <= 0) return null;
+
+  const parts = startDateIso.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+
+  const [year, month, day] = parts;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const next = new Date(year, month - 1, day);
+
+  while (next <= today) {
+    next.setDate(next.getDate() + intervalDays);
+  }
+
+  return formatSessionDate(next);
+}
+
+const defaultGames = CAMPAIGNS.map(campaign => ({
+  id: campaign.id,
+  title: campaign.title,
+  system: 'D&D 5e',
+  cadence: campaign.schedule,
+  nextSession:
+    getNextFromBaseline(campaign.startDate, campaign.cadenceDays) ??
+    getNextSessionFromWeekday(campaign.weekday, campaign.biweekly) ??
+    'Date TBD',
+  notes: campaign.blurb,
+}));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Keeper Dashboard • ${SITE_TITLE}`} description="Private control panel for scheduling and managing adventures." />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      if (sessionStorage.getItem('keeperAuth') === '1') {
+        document.documentElement.classList.add('keeper-auth');
+      }
+    </script>
+    <style>
+      :root{
+        --ink:#ffffff;
+        --muted:#e6f2ff;
+        --accent:#a7e0ff;
+        --panel: rgba(8,14,24,.82);
+        --edge: rgba(167,224,255,.25);
+        --shadow: 0 18px 50px rgba(2,4,11,.55);
+      }
+      html,body{height:100%;}
+      body{
+        margin:0;
+        color:var(--ink);
+        font:16px/1.6 "Manrope", ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background: radial-gradient(circle at top left, rgba(167,224,255,.16), transparent 60%),
+                    radial-gradient(circle at 80% 20%, rgba(255,140,210,.18), transparent 55%),
+                    #050811;
+      }
+      body::before{
+        content:"";
+        position:fixed;
+        inset:-120px;
+        background:url('/Mountains.png') center/cover no-repeat;
+        filter:blur(14px) brightness(.45);
+        opacity:.55;
+        z-index:0;
+      }
+      .wrap{ position:relative; z-index:1; display:flex; min-height:100dvh; flex-direction:column; }
+      main{ flex:1 1 auto; }
+      .container{ width:min(1360px,96%); margin-inline:auto; }
+
+      .dashboard-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:16px;
+        margin-bottom:28px;
+      }
+      .dashboard-head h1{ margin:0; font-size:clamp(26px, 3vw, 36px); }
+      .dashboard-head button{
+        padding:10px 18px;
+        border-radius:999px;
+        border:1px solid rgba(167,224,255,.35);
+        background:transparent;
+        color:#fff;
+        font-weight:600;
+        letter-spacing:.4px;
+        cursor:pointer;
+        transition:background .2s ease, border-color .2s ease;
+      }
+      .dashboard-head button:hover,
+      .dashboard-head button:focus-visible{
+        background:rgba(167,224,255,.2);
+        border-color:rgba(167,224,255,.55);
+      }
+
+      .blocked,
+      .dashboard-content{
+        background:var(--panel);
+        border:1px solid var(--edge);
+        border-radius:26px;
+        box-shadow:var(--shadow);
+        padding:32px clamp(20px, 5vw, 42px);
+        margin:64px 0;
+      }
+      .blocked{ display:flex; flex-direction:column; gap:16px; text-align:center; }
+      .blocked a{ color:var(--accent); }
+
+      .dashboard-content{ display:none; }
+      html.keeper-auth .dashboard-content{ display:grid; gap:32px; }
+      html.keeper-auth .blocked{ display:none; }
+
+      .manager-grid{ display:grid; gap:28px; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
+      .panel{
+        background:rgba(4,9,18,.78);
+        border:1px solid rgba(167,224,255,.35);
+        border-radius:22px;
+        padding:24px;
+        display:grid;
+        gap:18px;
+      }
+      .panel h2{ margin:0; font-size:20px; }
+      .panel p{ margin:0; color:rgba(226,242,255,.8); }
+
+      .game-grid{ display:grid; gap:16px; list-style:none; padding:0; margin:0; }
+      .game-card{
+        background:rgba(12,20,34,.9);
+        border:1px solid rgba(167,224,255,.3);
+        border-radius:18px;
+        padding:20px;
+        display:grid;
+        gap:10px;
+      }
+      .game-card h3{ margin:0; font-size:18px; }
+      .game-meta{ display:flex; flex-wrap:wrap; gap:10px; font-size:13px; color:rgba(226,242,255,.8); }
+      .game-meta span{ padding:4px 10px; border-radius:999px; background:rgba(167,224,255,.16); }
+      .game-notes{ margin:0; color:rgba(226,242,255,.8); font-size:14px; }
+      .card-actions{ display:flex; justify-content:flex-end; }
+      .card-actions button{
+        padding:6px 12px;
+        border-radius:999px;
+        border:none;
+        font-size:13px;
+        cursor:pointer;
+        background:rgba(255,120,160,.2);
+        color:#fff;
+        transition:background .2s ease;
+      }
+      .card-actions button:hover,
+      .card-actions button:focus-visible{ background:rgba(255,120,160,.32); }
+
+      form label{ display:grid; gap:6px; font-size:14px; color:rgba(226,242,255,.85); }
+      form input,
+      form textarea,
+      form select{
+        padding:12px 14px;
+        border-radius:12px;
+        border:1px solid rgba(167,224,255,.35);
+        background:rgba(6,9,18,.7);
+        color:#fff;
+        font:inherit;
+      }
+      form textarea{ min-height:120px; resize:vertical; }
+      form button[type="submit"]{
+        justify-self:start;
+        padding:10px 20px;
+        border-radius:999px;
+        border:none;
+        font-weight:600;
+        background:linear-gradient(120deg, rgba(167,224,255,.9), rgba(120,140,255,.9));
+        color:#02040b;
+        cursor:pointer;
+        box-shadow:0 16px 32px rgba(167,224,255,.25);
+      }
+      .empty-state{ font-size:14px; color:rgba(226,242,255,.75); }
+
+      @media (max-width:720px){
+        .dashboard-head{ flex-direction:column; align-items:flex-start; }
+        .dashboard-head button{ align-self:flex-end; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <Header />
+
+      <main>
+        <div class="container">
+          <section class="blocked" aria-live="polite">
+            <h1>Keeper access required</h1>
+            <p>This console is reserved for the Quest with Wasem game master. Return to the homepage to request access.</p>
+            <a href="/">Back to the tavern →</a>
+          </section>
+
+          <section class="dashboard-content" aria-labelledby="dashboard-title">
+            <div class="dashboard-head">
+              <h1 id="dashboard-title">Keeper Dashboard</h1>
+              <button type="button" data-logout>Log out</button>
+            </div>
+
+            <div class="manager-grid">
+              <article class="panel">
+                <h2>Active & Upcoming Games</h2>
+                <p>Review your tables, tweak details, and archive the ones that conclude.</p>
+                <ul class="game-grid" data-game-list></ul>
+                <p class="empty-state" data-empty-state hidden>No games tracked yet. Add one with the form on the right.</p>
+              </article>
+
+              <article class="panel">
+                <h2>Create or Update a Listing</h2>
+                <p>Fill in the adventure details below. You can use this for new campaigns or one-shots.</p>
+                <form data-game-form>
+                  <label>
+                    Adventure title
+                    <input type="text" name="title" placeholder="The Whispering Vault" required />
+                  </label>
+                  <label>
+                    Game system
+                    <input type="text" name="system" placeholder="D&D 5e" required />
+                  </label>
+                  <label>
+                    Next session or go-live date
+                    <input type="text" name="nextSession" placeholder="Friday, Oct 18" required />
+                  </label>
+                  <label>
+                    Schedule summary
+                    <input type="text" name="cadence" placeholder="Weekly • Thursdays • 7:00 PM CST" required />
+                  </label>
+                  <label>
+                    Notes for yourself
+                    <textarea name="notes" placeholder="Prep list, player roster, or reminders..."></textarea>
+                  </label>
+                  <button type="submit">Save listing</button>
+                </form>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+
+    <script type="application/json" id="keeper-defaults">{JSON.stringify(defaultGames)}</script>
+    <script is:inline>
+      const authActive = document.documentElement.classList.contains('keeper-auth');
+      if (!authActive) {
+        sessionStorage.removeItem('keeperAuth');
+      }
+
+      const logoutButton = document.querySelector('[data-logout]');
+      logoutButton?.addEventListener('click', () => {
+        sessionStorage.removeItem('keeperAuth');
+        window.location.href = '/';
+      });
+
+      if (!authActive) {
+        return;
+      }
+
+      const STORAGE_KEY = 'keeperGames';
+      const defaultsEl = document.getElementById('keeper-defaults');
+      const listEl = document.querySelector('[data-game-list]');
+      const emptyState = document.querySelector('[data-empty-state]');
+      const form = document.querySelector('[data-game-form]');
+      const createId = () => {
+        if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+          return crypto.randomUUID();
+        }
+        return `game-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      };
+
+      const parseDefaults = () => {
+        if (!defaultsEl) return [];
+        try {
+          return JSON.parse(defaultsEl.textContent || '[]');
+        } catch (error) {
+          console.warn('Failed to parse defaults', error);
+          return [];
+        }
+      };
+
+      const loadGames = () => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (error) {
+            console.warn('Failed to parse stored games', error);
+          }
+        }
+        const defaults = parseDefaults();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+        return defaults;
+      };
+
+      let games = loadGames();
+
+      const persist = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+      };
+
+      const renderGames = () => {
+        if (!listEl || !emptyState) return;
+        listEl.innerHTML = '';
+        if (games.length === 0) {
+          emptyState.hidden = false;
+          return;
+        }
+        emptyState.hidden = true;
+        const fragment = document.createDocumentFragment();
+        games.forEach((game, index) => {
+          const item = document.createElement('li');
+          item.className = 'game-card';
+          item.dataset.index = String(index);
+          item.innerHTML = `
+            <h3>${game.title}</h3>
+            <div class="game-meta">
+              <span>${game.system}</span>
+              <span>${game.cadence}</span>
+              <span>Next: ${game.nextSession}</span>
+            </div>
+            <p class="game-notes">${game.notes || 'No additional notes yet.'}</p>
+            <div class="card-actions">
+              <button type="button" data-remove="${index}">Archive</button>
+            </div>
+          `;
+          fragment.appendChild(item);
+        });
+        listEl.appendChild(fragment);
+      };
+
+      renderGames();
+
+      listEl?.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const removeIndex = target.dataset.remove;
+        if (removeIndex === undefined) return;
+        const index = Number.parseInt(removeIndex, 10);
+        if (Number.isNaN(index)) return;
+        games.splice(index, 1);
+        persist();
+        renderGames();
+      });
+
+      form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!form) return;
+        const formData = new FormData(form);
+        const title = String(formData.get('title') || '').trim();
+        const system = String(formData.get('system') || '').trim();
+        const nextSession = String(formData.get('nextSession') || '').trim();
+        const cadence = String(formData.get('cadence') || '').trim();
+        const notes = String(formData.get('notes') || '').trim();
+        if (!title || !system || !nextSession || !cadence) {
+          return;
+        }
+        games.unshift({ id: createId(), title, system, nextSession, cadence, notes });
+        persist();
+        renderGames();
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
