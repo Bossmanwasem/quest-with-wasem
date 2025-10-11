@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { campaigns as CAMPAIGNS } from '../campaigns';
+import { oneShots as ONE_SHOTS } from '../oneShots';
 
 // Random fantasy greeting (changes each page load)
 function getRandomGreeting() {
@@ -22,46 +23,64 @@ function getRandomGreeting() {
 }
 const randomGreeting = getRandomGreeting();
 
+function formatSessionDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
 // Fallback: compute next weekday (weekly/biweekly) if no baseline is set
-function getNextSession(weekday: number, biweekly = false) {
-  const today = new Date(); today.setHours(0,0,0,0);
+function getNextSessionFromWeekday(weekday?: number, biweekly = false) {
+  if (typeof weekday !== 'number' || Number.isNaN(weekday)) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const currentDay = today.getDay();
+  const interval = biweekly ? 14 : 7;
   let daysUntil = (weekday - currentDay + 7) % 7;
-  if (daysUntil === 0) daysUntil = 7; // always move forward
+  if (daysUntil === 0) daysUntil = interval; // always move forward
+
   const next = new Date(today);
   next.setDate(today.getDate() + daysUntil);
 
-  if (biweekly) {
-    const weekNum = Math.floor(next.getTime() / (1000 * 60 * 60 * 24 * 7));
-    if (weekNum % 2 !== 0) next.setDate(next.getDate() + 7);
+  while (next <= today) {
+    next.setDate(next.getDate() + interval);
   }
-  if (next <= today) next.setDate(next.getDate() + (biweekly ? 14 : 7));
 
-  return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  return formatSessionDate(next);
 }
 
-// New: advance from a fixed baseline month/day & interval (days)
-function getNextFromBaseline(month: number, day: number, intervalDays: number) {
-  const today = new Date(); today.setHours(0,0,0,0);
-  let next = new Date(today.getFullYear(), month - 1, day); // month is 1–12
-  while (next <= today) next.setDate(next.getDate() + intervalDays);
-  return next.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-}
+// Advance from a fixed baseline date & interval (days)
+function getNextFromBaseline(startDateIso?: string, intervalDays?: number) {
+  if (!startDateIso || !intervalDays || intervalDays <= 0) return null;
 
-// Baseline overrides (MM, DD, intervalDays)
-const NEXT_OVERRIDES: Record<string, {month:number; day:number; intervalDays:number}> = {
-  acroterra:   { month: 8, day: 11, intervalDays: 14 }, // starts Aug 11, then every 14 days
-  drakkenheim: { month: 8, day: 20, intervalDays: 14 }, // starts Aug 20, then every 14 days
-};
+  const parts = startDateIso.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+
+  const [year, month, day] = parts;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const next = new Date(year, month - 1, day);
+
+  while (next <= today) {
+    next.setDate(next.getDate() + intervalDays);
+  }
+
+  return formatSessionDate(next);
+}
 
 // Build campaign list with dynamic nextSession
 const campaigns = CAMPAIGNS.map(c => {
-  const ov = NEXT_OVERRIDES[c.id];
-  const nextSession = ov
-    ? getNextFromBaseline(ov.month, ov.day, ov.intervalDays)
-    : getNextSession(c.weekday, c.biweekly);
+  const nextSession =
+    getNextFromBaseline(c.startDate, c.cadenceDays) ??
+    getNextSessionFromWeekday(c.weekday, c.biweekly) ??
+    'Date TBD';
   return { ...c, nextSession };
 });
+
+const oneShots = ONE_SHOTS;
 ---
 
 <!doctype html>
@@ -143,6 +162,30 @@ const campaigns = CAMPAIGNS.map(c => {
       .next-session{ display:inline-block; margin-top:6px; padding:4px 10px; font-size:12px; background: rgba(255,255,255,.15); border-radius: 999px; }
       .blurb{ margin:12px 0 0; color:#fff; opacity:.92; }
 
+      .oneshot-grid{ display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .oneshot-card .card-body{ gap:10px; }
+      .oneshot-card .schedule span:last-child{ color:rgba(255,255,255,.85); }
+      .cta-link{
+        margin-top:auto;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 18px;
+        font-weight:600;
+        font-size:14px;
+        letter-spacing:.3px;
+        color:#fff;
+        background:rgba(167,224,255,.18);
+        border-radius:999px;
+        text-decoration:none;
+        transition:background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+      }
+      .cta-link:hover{
+        background:rgba(167,224,255,.32);
+        transform:translateY(-1px);
+        box-shadow:0 8px 20px rgba(0,0,0,.35);
+      }
+
       .spacer{ height:28px; }
       @media (max-width:380px){ .card-body{ padding:16px; } }
     </style>
@@ -178,6 +221,34 @@ const campaigns = CAMPAIGNS.map(c => {
                   </div>
                 </article>
               </a>
+            ))}
+          </div>
+
+          <div class="spacer"></div>
+        </section>
+
+        <section class="container" aria-labelledby="one-shot-adventures">
+          <div class="section-head">
+            <h2 id="one-shot-adventures">One-Shot Adventures</h2>
+          </div>
+
+          <div class="grid oneshot-grid">
+            {oneShots.map(shot => (
+              <article class="card oneshot-card" id={shot.id}>
+                <img src={shot.image} alt={`${shot.title} illustration`} />
+                <div class="card-body">
+                  <h3>{shot.title}</h3>
+                  <div class="schedule" aria-label="recommended party level and system">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>{shot.level} • {shot.system}</span>
+                  </div>
+                  <p class="blurb">{shot.blurb}</p>
+                  <a class="cta-link" href={shot.vttUrl} target="_blank" rel="noopener">
+                    Launch the VTT
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
             ))}
           </div>
 
