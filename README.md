@@ -55,6 +55,15 @@ All commands are run from the root of the project, from a terminal:
 | `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
 | `npm wrangler tail`               | View real-time logs for all Workers              |
 
+### GM Hub configuration
+
+The GM Hub login page expects private environment variables so that credentials are never committed to the repository. Define the following secrets in your deployment environment (for local development you can add them to a `.env` file):
+
+- `GM_HUB_USERNAME`
+- `GM_HUB_PASSWORD`
+
+Without these values the login endpoint will respond with a temporary error message and access will be blocked.
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

@@ -1,0 +1,343 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+
+const pageTitle = `GM Hub | ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={pageTitle} description="Secure access point for Quest with Wasem GMs." />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-image: url('/Mountains.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: white;
+        font-family: "Atkinson", sans-serif;
+      }
+
+      main {
+        flex: 1 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+      }
+
+      .login-card {
+        width: min(420px, 100%);
+        padding: clamp(2rem, 5vw, 3rem);
+        background: rgba(5, 9, 20, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(12px);
+      }
+
+      .login-card h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(2rem, 4vw, 2.6rem);
+        color: #ffffff;
+        text-align: center;
+      }
+
+      .login-card p {
+        margin: 0 0 1.5rem;
+        color: rgba(226, 242, 255, 0.9);
+        text-align: center;
+      }
+
+      form {
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      label {
+        display: grid;
+        gap: 0.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      input {
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        font-size: 1rem;
+        transition: border-color 150ms ease, background 150ms ease;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: rgba(167, 224, 255, 0.8);
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 0 3px rgba(167, 224, 255, 0.25);
+      }
+
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        background: linear-gradient(135deg, rgba(167, 224, 255, 0.95), rgba(95, 173, 255, 0.95));
+        color: #050914;
+        cursor: pointer;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 30px rgba(95, 173, 255, 0.35);
+      }
+
+      button:focus-visible {
+        outline: 3px solid rgba(167, 224, 255, 0.5);
+        outline-offset: 3px;
+      }
+
+      .feedback {
+        margin-top: 0.5rem;
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        display: none;
+      }
+
+      .feedback[data-state='error'] {
+        display: block;
+        background: rgba(255, 107, 107, 0.18);
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        color: #ffdede;
+      }
+
+      .feedback[data-state='success'] {
+        display: block;
+        background: rgba(120, 255, 197, 0.18);
+        border: 1px solid rgba(120, 255, 197, 0.45);
+        color: #dbffe8;
+      }
+
+      .success-state {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 1px solid rgba(120, 255, 197, 0.4);
+        background: rgba(12, 40, 28, 0.65);
+        color: #d4ffef;
+        text-align: center;
+        display: none;
+      }
+
+      .success-state h2 {
+        margin: 0 0 0.5rem;
+        font-size: 1.45rem;
+        color: #e9fff6;
+      }
+
+      .success-state p {
+        margin: 0;
+        color: rgba(228, 255, 242, 0.92);
+      }
+
+      .hint {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: rgba(226, 242, 255, 0.7);
+      }
+
+      footer {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 480px) {
+        main {
+          padding: 2.5rem 1rem;
+        }
+
+        .login-card {
+          padding: 1.75rem 1.25rem 2rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <Header />
+    <main>
+      <section class="login-card">
+        <h1>GM Hub Login</h1>
+        <p>Restricted access for Quest with Wasem game masters.</p>
+        <form data-login-form>
+          <label for="gm-username">
+            Email
+            <input
+              id="gm-username"
+              name="username"
+              type="email"
+              inputmode="email"
+              autocomplete="username"
+              required
+              placeholder="name@example.com"
+            />
+          </label>
+          <label for="gm-password">
+            Password
+            <input
+              id="gm-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              placeholder="••••••••"
+            />
+          </label>
+          <button type="submit">Sign In</button>
+          <p class="hint">Use the credentials provided directly by Wasem.</p>
+          <p class="feedback" role="status" aria-live="polite" data-feedback></p>
+        </form>
+        <div class="success-state" data-success>
+          <h2>Access granted</h2>
+          <p>The GM Hub is coming soon. Stay tuned for new tools and dashboards.</p>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <script is:inline>
+      const form = document.querySelector('[data-login-form]');
+      const feedback = document.querySelector('[data-feedback]');
+      const success = document.querySelector('[data-success]');
+
+      const setFeedback = (state, message) => {
+        if (!(feedback instanceof HTMLElement)) {
+          return;
+        }
+
+        if (!state) {
+          feedback.removeAttribute('data-state');
+        } else {
+          feedback.dataset.state = state;
+        }
+
+        feedback.textContent = message ?? '';
+      };
+
+      const resetSuccessState = () => {
+        if (success instanceof HTMLElement) {
+          success.style.display = 'none';
+        }
+      };
+
+      const showSuccessState = () => {
+        if (success instanceof HTMLElement) {
+          success.style.display = 'block';
+        }
+      };
+
+      if (form) {
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        const setSubmittingState = (isSubmitting) => {
+          if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = isSubmitting;
+          }
+        };
+
+        const disableFormControls = () => {
+          Array.from(form.elements).forEach((element) => {
+            if (element instanceof HTMLInputElement || element instanceof HTMLButtonElement) {
+              element.disabled = true;
+            }
+          });
+        };
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(form);
+          const submittedUsername = String(formData.get('username') ?? '').trim();
+          const submittedPassword = String(formData.get('password') ?? '');
+
+          setFeedback(undefined, '');
+          resetSuccessState();
+          setSubmittingState(true);
+
+          try {
+            const response = await fetch('/api/gm-login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ username: submittedUsername, password: submittedPassword }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Unable to verify credentials.');
+            }
+
+            const result = await response.json();
+
+            if (result?.success) {
+              setFeedback('success', 'Welcome back! Redirecting to the GM tools soon.');
+              showSuccessState();
+              disableFormControls();
+              return;
+            }
+
+            const message =
+              typeof result?.message === 'string'
+                ? result.message
+                : 'Those credentials are not recognized. Please try again.';
+
+            setFeedback('error', message);
+          } catch (error) {
+            console.error(error);
+            setFeedback(
+              'error',
+              'We could not verify your credentials right now. Please try again later or contact Wasem.'
+            );
+          } finally {
+            if (!(success instanceof HTMLElement) || success.style.display !== 'block') {
+              setSubmittingState(false);
+            }
+          }
+        });
+
+        form.querySelectorAll('input').forEach((input) => {
+          input.addEventListener('input', () => {
+            setFeedback(undefined, '');
+            resetSuccessState();
+
+            if (submitButton instanceof HTMLButtonElement && submitButton.disabled) {
+              setSubmittingState(false);
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
