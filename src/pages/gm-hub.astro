@@ -154,6 +154,10 @@ const validPassword = 'Xqxq77##';
         display: none;
       }
 
+      .success-state:not([hidden]) {
+        display: block;
+      }
+
       .success-state h2 {
         margin: 0 0 0.5rem;
         font-size: 1.45rem;
@@ -219,9 +223,15 @@ const validPassword = 'Xqxq77##';
           </label>
           <button type="submit">Sign In</button>
           <p class="hint">Use the credentials provided directly by Wasem.</p>
-          <p class="feedback" role="status" aria-live="polite" data-feedback></p>
+          <p
+            class="feedback"
+            role="status"
+            aria-live="polite"
+            data-feedback
+            hidden
+          ></p>
         </form>
-        <div class="success-state" data-success>
+        <div class="success-state" data-success hidden>
           <h2>Access granted</h2>
           <p>The GM Hub is coming soon. Stay tuned for new tools and dashboards.</p>
         </div>
@@ -237,6 +247,30 @@ const validPassword = 'Xqxq77##';
       const feedback = document.querySelector('[data-feedback]');
       const success = document.querySelector('[data-success]');
 
+      const displayFeedback = (state, message = '') => {
+        if (!(feedback instanceof HTMLElement) || !(success instanceof HTMLElement)) {
+          return;
+        }
+
+        if (!state) {
+          feedback.hidden = true;
+          feedback.removeAttribute('data-state');
+          feedback.textContent = '';
+          success.hidden = true;
+          return;
+        }
+
+        feedback.hidden = false;
+        feedback.dataset.state = state;
+        feedback.textContent = message;
+
+        if (state === 'success') {
+          success.hidden = false;
+        } else {
+          success.hidden = true;
+        }
+      };
+
       if (form && feedback && success) {
         form.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -246,28 +280,20 @@ const validPassword = 'Xqxq77##';
           const submittedPassword = String(formData.get('password') ?? '');
 
           if (submittedUsername === username && submittedPassword === password) {
-            feedback.dataset.state = 'success';
-            feedback.textContent = 'Welcome back, Jordan!';
-            success.style.display = 'block';
+            displayFeedback('success', 'Welcome back, Jordan!');
             Array.from(form.elements).forEach((element) => {
               if (element instanceof HTMLInputElement || element instanceof HTMLButtonElement) {
                 element.disabled = true;
               }
             });
           } else {
-            feedback.dataset.state = 'error';
-            feedback.textContent = 'Those credentials are not recognized. Please try again.';
-            success.style.display = 'none';
+            displayFeedback('error', 'Those credentials are not recognized. Please try again.');
           }
         });
 
         form.querySelectorAll('input').forEach((input) => {
           input.addEventListener('input', () => {
-            if (feedback instanceof HTMLElement) {
-              feedback.removeAttribute('data-state');
-              feedback.textContent = '';
-              success.style.display = 'none';
-            }
+            displayFeedback(null);
           });
         });
       }
