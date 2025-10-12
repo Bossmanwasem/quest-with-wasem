@@ -57,12 +57,14 @@ All commands are run from the root of the project, from a terminal:
 
 ### GM Hub configuration
 
-The GM Hub login page expects private environment variables so that credentials are never committed to the repository. Define the following secrets in your deployment environment (for local development you can add them to a `.env` file):
+The GM Hub login page expects private environment variables so that credentials are never committed to the repository. Define the following secrets in your deployment environment (for local development you can add them to a `.env` file or export them in your shell):
 
-- `GM_HUB_USERNAME`
-- `GM_HUB_PASSWORD`
+- `GM_HUB_PASSWORD` — the password required to unlock the hub.
+- `GM_HUB_ALLOWED_IDENTIFIERS` — a comma- or newline-separated list of email addresses or usernames that are allowed to log in. If you only have a single identifier you can set `GM_HUB_USERNAME` instead and it will be used automatically.
 
-Without these values the login endpoint will respond with a temporary error message and access will be blocked.
+Both environment variable families are supported so you can keep your existing `GM_HUB_USERNAME` configuration without any changes. If no identifiers or password are configured the login endpoint will respond with a temporary error message and access will be blocked.
+
+See `.env.example` for a starter template you can copy to `.env` when running the site locally.
 
 ## 👀 Want to learn more?
 

@@ -11,6 +11,34 @@ const jsonResponse = (status: number, body: Record<string, unknown>) =>
     },
   });
 
+const getPrivateEnv = (key: string): string | undefined => {
+  const metaEnv = import.meta.env as Record<string, string | undefined>;
+  const fromImportMeta = typeof metaEnv?.[key] === 'string' ? metaEnv[key] : undefined;
+
+  if (fromImportMeta) {
+    return fromImportMeta;
+  }
+
+  if (typeof process !== 'undefined' && typeof process.env?.[key] === 'string') {
+    return process.env[key];
+  }
+
+  return undefined;
+};
+
+const parseAllowedIdentifiers = (raw: string | undefined): string[] => {
+  if (!raw) {
+    return [];
+  }
+
+  return raw
+    .split(/[,\n]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+};
+
+const normalizeIdentifier = (value: string): string => value.trim().toLowerCase();
+
 const safeCompare = (input: unknown, secret: string): boolean => {
   if (typeof input !== 'string') {
     return false;
@@ -29,10 +57,13 @@ const safeCompare = (input: unknown, secret: string): boolean => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  const configuredUsername = import.meta.env.GM_HUB_USERNAME;
-  const configuredPassword = import.meta.env.GM_HUB_PASSWORD;
+  const configuredPassword = getPrivateEnv('GM_HUB_PASSWORD');
+  const configuredUsername = getPrivateEnv('GM_HUB_USERNAME');
+  const configuredIdentifiers = parseAllowedIdentifiers(
+    getPrivateEnv('GM_HUB_ALLOWED_IDENTIFIERS') ?? configuredUsername,
+  );
 
-  if (!configuredUsername || !configuredPassword) {
+  if (!configuredPassword || configuredIdentifiers.length === 0) {
     console.warn('GM Hub login attempted without configured credentials.');
     return jsonResponse(503, {
       success: false,
@@ -66,10 +97,16 @@ export const POST: APIRoute = async ({ request }) => {
 
   const { username, password } = payload as { username: unknown; password: unknown };
 
-  const isValid =
-    safeCompare(username, configuredUsername) && safeCompare(password, configuredPassword);
+  const providedIdentifier = typeof username === 'string' ? normalizeIdentifier(username) : undefined;
+  const providedPassword = typeof password === 'string' ? password : undefined;
 
-  if (!isValid) {
+  const isIdentifierValid =
+    typeof providedIdentifier === 'string' &&
+    configuredIdentifiers.some((identifier) => safeCompare(providedIdentifier, normalizeIdentifier(identifier)));
+
+  const isPasswordValid = typeof providedPassword === 'string' && safeCompare(providedPassword, configuredPassword);
+
+  if (!isIdentifierValid || !isPasswordValid) {
     return jsonResponse(401, {
       success: false,
       message: 'Those credentials are not recognized. Please try again.',
