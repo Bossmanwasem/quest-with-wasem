@@ -55,6 +55,18 @@ All commands are run from the root of the project, from a terminal:
 | `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
 | `npm wrangler tail`               | View real-time logs for all Workers              |
 
+## Virtual tabletop tunnel
+
+The Cloudflare Tunnel configuration in `cloudflared/config.yml` sends
+`play.questwithwasem.com` to the virtual tabletop at
+`http://64.191.7.28:30000`. The tunnel credentials are intentionally not stored
+in this repository; install the matching credentials JSON at the path specified
+by `credentials-file` before starting the connector:
+
+```sh
+cloudflared tunnel --config cloudflared/config.yml run
+```
+
 ## 👀 Want to learn more?
 
 Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
