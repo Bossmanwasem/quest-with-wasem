@@ -2,9 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-
-const vttUrl = 'https://play.questwithwasem.com';
+import { SITE_TITLE, SITE_DESCRIPTION, VTT_URL } from '../consts';
 ---
 
 <!doctype html>
@@ -76,7 +74,7 @@ const vttUrl = 'https://play.questwithwasem.com';
       <Header />
 
       <main>
-        <a class="vtt-button" href={vttUrl} target="_blank" rel="noopener noreferrer">
+        <a class="vtt-button" href={VTT_URL} target="_blank" rel="noopener noreferrer">
           Open Virtual Tabletop
         </a>
       </main>

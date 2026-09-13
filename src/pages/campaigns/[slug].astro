@@ -2,6 +2,7 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import { VTT_URL } from '../../consts';
 import { campaigns } from '../../campaigns';
 import { getCollection, render } from 'astro:content';
 
@@ -154,7 +155,7 @@ const recaps = await Promise.all(
               🎲 Download Kevin's Guide to Acroterra PDF 🎲
             </a>
           )}
-          <a class="cta-btn" href="https://play.questwithwasem.com" target="_blank" rel="noopener">
+          <a class="cta-btn" href={VTT_URL} target="_blank" rel="noopener">
             🎲 Go to Virtual Table Top 🎲
           </a>
         </div>

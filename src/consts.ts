@@ -3,3 +3,4 @@
 
 export const SITE_TITLE = "Quest With Wasem";
 export const SITE_DESCRIPTION = "Adventure Awaits! DM Wasem's TTRPG hosting Hub. Find your Documents, World lore and VTT information.";
+export const VTT_URL = "http://64.191.7.28:30000/";

@@ -1,3 +1,5 @@
+import { VTT_URL } from './consts';
+
 export type OneShot = {
   id: string;
   title: string;
@@ -17,6 +19,6 @@ export const oneShots: OneShot[] = [
     image: '/Mountains.png',
     blurb:
       "Marlowe Fairwind has hired a hardy band to escort a sealed crate to the Whitefire Arcanist in the village of Hush. The Sablewood seethes with hybrid beasts, whispering trees, and broken pacts eager to claim the prize. Keep the cargo safe alongside Marlowe Fairwind the Loreborne Elf Sorcerer, Barnacle the Underborne Ribbet Rogue, Garrick Reed the Highborne Human Warrior, Khari Nix the Ridgeborne Giant Guardian, and Varian Soto the Wildborne Katari Ranger.",
-    vttUrl: 'https://play.questwithwasem.com',
+    vttUrl: VTT_URL,
   },
 ];
