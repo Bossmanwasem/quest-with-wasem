@@ -1,7 +1,0 @@
-tunnel: fb1c72a4-1d56-4825-8a2b-bc5da841ae66
-credentials-file: /etc/cloudflared/fb1c72a4-1d56-4825-8a2b-bc5da841ae66.json
-
-ingress:
-  - hostname: play.questwithwasem.com
-    service: http://64.191.7.28:30000
-  - service: http_status:404
